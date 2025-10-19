@@ -2,6 +2,9 @@
 
 Un'app per analizzare i tuoi dati di Instagram e confrontare followers e following.
 
+## 🔒 **IMPORTANTE: Privacy e Sicurezza**
+Prima di condividere questo progetto, leggi la [**Guida Sicurezza**](SECURITY_GUIDE.md) per proteggere i tuoi dati personali.
+
 ## Funzionalità
 
 ### 1. Analisi Follow/Following
