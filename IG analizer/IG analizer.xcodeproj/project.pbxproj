@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		655B24532EA7951500A2D7E1 /* Appicon.icon in Resources */ = {isa = PBXBuildFile; fileRef = 655B24522EA7951500A2D7E1 /* Appicon.icon */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		650520CD2EA0475000E381A7 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -14,7 +18,7 @@
 			remoteGlobalIDString = 650520BD2EA0475000E381A7;
 			remoteInfo = "IG analizer";
 		};
-		650520D72EA0475000E381A7 /* PBXContainerItemProxy */ = {
+		65B0CEDD2EA653FE00608374 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 650520B62EA0475000E381A7 /* Project object */;
 			proxyType = 1;
@@ -26,7 +30,14 @@
 /* Begin PBXFileReference section */
 		650520BE2EA0475000E381A7 /* IG analizer.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "IG analizer.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		650520CC2EA0475000E381A7 /* IG analizerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "IG analizerTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		650520D62EA0475000E381A7 /* IG analizerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "IG analizerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		655B24522EA7951500A2D7E1 /* Appicon.icon */ = {isa = PBXFileReference; lastKnownFileType = folder.iconcomposer.icon; path = Appicon.icon; sourceTree = "<group>"; };
+		65A9CAC32EA1BDA70022DF52 /* IG analizer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "IG analizer.xcodeproj"; sourceTree = "<group>"; };
+		65A9CB7C2EA62D840022DF52 /* IG analizer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "IG analizer.xcodeproj"; sourceTree = "<group>"; };
+		65A9CC392EA638240022DF52 /* IG analizer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "IG analizer.xcodeproj"; sourceTree = "<group>"; };
+		65B0CED72EA653FE00608374 /* IG analizerUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "IG analizerUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		65B7A5E72EA647C5001F1612 /* IG analizer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "IG analizer.xcodeproj"; sourceTree = "<group>"; };
+		65B7A61D2EA6498D001F1612 /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
+		65ED75A52EA6434300A65BEF /* IG analizer.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = "IG analizer.xcodeproj"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -41,6 +52,11 @@
 			sourceTree = "<group>";
 		};
 		650520D92EA0475000E381A7 /* IG analizerUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "IG analizerUITests";
+			sourceTree = "<group>";
+		};
+		65B0CED82EA653FE00608374 /* IG analizerUITests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "IG analizerUITests";
 			sourceTree = "<group>";
@@ -62,7 +78,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		650520D32EA0475000E381A7 /* Frameworks */ = {
+		65B0CED42EA653FE00608374 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -78,7 +94,10 @@
 				650520C02EA0475000E381A7 /* IG analizer */,
 				650520CF2EA0475000E381A7 /* IG analizerTests */,
 				650520D92EA0475000E381A7 /* IG analizerUITests */,
+				65B0CED82EA653FE00608374 /* IG analizerUITests */,
+				65B7A61C2EA6498D001F1612 /* Frameworks */,
 				650520BF2EA0475000E381A7 /* Products */,
+				655B24522EA7951500A2D7E1 /* Appicon.icon */,
 			);
 			sourceTree = "<group>";
 		};
@@ -87,7 +106,48 @@
 			children = (
 				650520BE2EA0475000E381A7 /* IG analizer.app */,
 				650520CC2EA0475000E381A7 /* IG analizerTests.xctest */,
-				650520D62EA0475000E381A7 /* IG analizerUITests.xctest */,
+				65B0CED72EA653FE00608374 /* IG analizerUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		65A9CACB2EA1BDA70022DF52 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		65A9CB842EA62D840022DF52 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		65A9CC412EA638240022DF52 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		65B7A5EE2EA647C5001F1612 /* Products */ = {
+			isa = PBXGroup;
+			name = Products;
+			sourceTree = "<group>";
+		};
+		65B7A61C2EA6498D001F1612 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				65B7A61D2EA6498D001F1612 /* XCTest.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		65ED75AD2EA6434300A65BEF /* Products */ = {
+			isa = PBXGroup;
+			children = (
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -140,27 +200,27 @@
 			productReference = 650520CC2EA0475000E381A7 /* IG analizerTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		650520D52EA0475000E381A7 /* IG analizerUITests */ = {
+		65B0CED62EA653FE00608374 /* IG analizerUITests */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 650520E62EA0475000E381A7 /* Build configuration list for PBXNativeTarget "IG analizerUITests" */;
+			buildConfigurationList = 65B0CEDF2EA653FE00608374 /* Build configuration list for PBXNativeTarget "IG analizerUITests" */;
 			buildPhases = (
-				650520D22EA0475000E381A7 /* Sources */,
-				650520D32EA0475000E381A7 /* Frameworks */,
-				650520D42EA0475000E381A7 /* Resources */,
+				65B0CED32EA653FE00608374 /* Sources */,
+				65B0CED42EA653FE00608374 /* Frameworks */,
+				65B0CED52EA653FE00608374 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				650520D82EA0475000E381A7 /* PBXTargetDependency */,
+				65B0CEDE2EA653FE00608374 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
-				650520D92EA0475000E381A7 /* IG analizerUITests */,
+				65B0CED82EA653FE00608374 /* IG analizerUITests */,
 			);
 			name = "IG analizerUITests";
 			packageProductDependencies = (
 			);
 			productName = "IG analizerUITests";
-			productReference = 650520D62EA0475000E381A7 /* IG analizerUITests.xctest */;
+			productReference = 65B0CED72EA653FE00608374 /* IG analizerUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
 /* End PBXNativeTarget section */
@@ -180,7 +240,7 @@
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 650520BD2EA0475000E381A7;
 					};
-					650520D52EA0475000E381A7 = {
+					65B0CED62EA653FE00608374 = {
 						CreatedOnToolsVersion = 16.4;
 						TestTargetID = 650520BD2EA0475000E381A7;
 					};
@@ -198,11 +258,33 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 650520BF2EA0475000E381A7 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = 65B7A5EE2EA647C5001F1612 /* Products */;
+					ProjectRef = 65B7A5E72EA647C5001F1612 /* IG analizer.xcodeproj */;
+				},
+				{
+					ProductGroup = 65A9CC412EA638240022DF52 /* Products */;
+					ProjectRef = 65A9CC392EA638240022DF52 /* IG analizer.xcodeproj */;
+				},
+				{
+					ProductGroup = 65A9CACB2EA1BDA70022DF52 /* Products */;
+					ProjectRef = 65A9CAC32EA1BDA70022DF52 /* IG analizer.xcodeproj */;
+				},
+				{
+					ProductGroup = 65A9CB842EA62D840022DF52 /* Products */;
+					ProjectRef = 65A9CB7C2EA62D840022DF52 /* IG analizer.xcodeproj */;
+				},
+				{
+					ProductGroup = 65ED75AD2EA6434300A65BEF /* Products */;
+					ProjectRef = 65ED75A52EA6434300A65BEF /* IG analizer.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				650520BD2EA0475000E381A7 /* IG analizer */,
 				650520CB2EA0475000E381A7 /* IG analizerTests */,
-				650520D52EA0475000E381A7 /* IG analizerUITests */,
+				65B0CED62EA653FE00608374 /* IG analizerUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -212,6 +294,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				655B24532EA7951500A2D7E1 /* Appicon.icon in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,7 +305,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		650520D42EA0475000E381A7 /* Resources */ = {
+		65B0CED52EA653FE00608374 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -246,7 +329,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		650520D22EA0475000E381A7 /* Sources */ = {
+		65B0CED32EA653FE00608374 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -261,10 +344,10 @@
 			target = 650520BD2EA0475000E381A7 /* IG analizer */;
 			targetProxy = 650520CD2EA0475000E381A7 /* PBXContainerItemProxy */;
 		};
-		650520D82EA0475000E381A7 /* PBXTargetDependency */ = {
+		65B0CEDE2EA653FE00608374 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 650520BD2EA0475000E381A7 /* IG analizer */;
-			targetProxy = 650520D72EA0475000E381A7 /* PBXContainerItemProxy */;
+			targetProxy = 65B0CEDD2EA653FE00608374 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -392,6 +475,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "IG analizer/IG_analizer.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -417,6 +501,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS = YES;
 				CODE_SIGN_ENTITLEMENTS = "IG analizer/IG_analizer.entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
@@ -471,33 +556,45 @@
 			};
 			name = Release;
 		};
-		650520E72EA0475000E381A7 /* Debug */ = {
+		65B0CEE02EA653FE00608374 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.skpx.IG-analizerUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = "IG analizer";
+				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Debug;
 		};
-		650520E82EA0475000E381A7 /* Release */ = {
+		65B0CEE12EA653FE00608374 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.5;
+				MACOSX_DEPLOYMENT_TARGET = 15.5;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = "com.skpx.IG-analizerUITests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx xros xrsimulator";
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2,7";
 				TEST_TARGET_NAME = "IG analizer";
+				XROS_DEPLOYMENT_TARGET = 2.5;
 			};
 			name = Release;
 		};
@@ -531,11 +628,11 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		650520E62EA0475000E381A7 /* Build configuration list for PBXNativeTarget "IG analizerUITests" */ = {
+		65B0CEDF2EA653FE00608374 /* Build configuration list for PBXNativeTarget "IG analizerUITests" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				650520E72EA0475000E381A7 /* Debug */,
-				650520E82EA0475000E381A7 /* Release */,
+				65B0CEE02EA653FE00608374 /* Debug */,
+				65B0CEE12EA653FE00608374 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

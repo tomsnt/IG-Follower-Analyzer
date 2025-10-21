@@ -327,6 +327,13 @@
             const notFollowing = followers.filter(u => !followingUsernames.has(u.username));
             const mutualFollows = following.filter(u => followersUsernames.has(u.username));
             
+            // Salva snapshot per cronologia
+            saveSnapshot(followers, following, {
+                mutualFollowsCount: mutualFollows.length,
+                nonMutualFollowingCount: notFollowingBack.length,
+                nonMutualFollowersCount: notFollowing.length
+            });
+            
             const analysisResults = document.getElementById('analysisResults');
             analysisResults.innerHTML = `
                 <div class="stat-card">
@@ -350,6 +357,35 @@
                 <h3>Potresti seguire:</h3>
                 ${createUserList(notFollowing.slice(0, 20))}
             `;
+        }
+        
+        // History Management
+        function saveSnapshot(followers, following, analysis) {
+            const snapshot = {
+                date: new Date().toISOString(),
+                followersCount: followers.length,
+                followingCount: following.length,
+                mutualFollowsCount: analysis.mutualFollowsCount,
+                nonMutualFollowingCount: analysis.nonMutualFollowingCount,
+                nonMutualFollowersCount: analysis.nonMutualFollowersCount
+            };
+            
+            let history = JSON.parse(localStorage.getItem('followersHistory') || '[]');
+            history.push(snapshot);
+            
+            // Mantieni solo gli ultimi 30 snapshots
+            if (history.length > 30) {
+                history = history.slice(-30);
+            }
+            
+            localStorage.setItem('followersHistory', JSON.stringify(history));
+            updateChart();
+        }
+        
+        function updateChart() {
+            const history = JSON.parse(localStorage.getItem('followersHistory') || '[]');
+            // TODO: Implementare chart con libreria come Chart.js
+            console.log('History updated:', history);
         }
         
         function createUserList(users) {

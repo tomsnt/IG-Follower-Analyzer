@@ -5,17 +5,24 @@ Un'app per analizzare i tuoi dati di Instagram e confrontare followers e followi
 ## 🔒 **IMPORTANTE: Privacy e Sicurezza**
 Prima di condividere questo progetto, leggi la [**Guida Sicurezza**](SECURITY_GUIDE.md) per proteggere i tuoi dati personali.
 
-## Funzionalità
+## ✨ Funzionalità
 
-### 1. Analisi Follow/Following
+### 1. 📊 **Analisi Follow/Following**
 - **Non ti seguono**: Persone che segui ma che non ti seguono indietro
 - **Non segui**: Persone che ti seguono ma che tu non segui
 - **Follow mutui**: Persone con cui hai un follow reciproco
 
-### 2. Confronto Temporale
-- **Nuovi followers**: Persone che hanno iniziato a seguirti
-- **Followers persi**: Persone che hanno smesso di seguirti
-- **Statistiche di crescita**: Confronto tra diversi periodi
+### 2. 📈 **Tracking Temporale** (NUOVO!)
+- **Grafico crescita**: Visualizza l'andamento followers/following nel tempo
+- **Snapshot automatici**: Salva dati ad ogni analisi
+- **Statistiche crescita**: Crescita media giornaliera
+- **Trend analysis**: Identifica pattern di crescita
+
+### 3. ⏱️ **Cronologia Avanzata**
+- **Storia ultimi 30 giorni**: Mantiene snapshot recenti
+- **Confronto date**: Vedi cambiamenti tra periodi specifici  
+- **Growth rate**: Calcola velocità di crescita
+- **Export dati**: Salvataggio locale sicuro
 
 ## Come Utilizzare
 
@@ -80,20 +87,34 @@ Nella cartella del progetto troverai:
 
 Puoi usare questi file per testare l'app prima di caricare i tuoi dati reali.
 
-## Funzionalità Avanzate
+## 🔧 Funzionalità Avanzate
 
-### Salvataggio Automatico
+### 📊 **Tracking Temporale** 
+- **Grafico real-time**: Sempre visibile nella colonna destra
+- **Snapshot automatici**: Salvati ad ogni "Analizza"
+- **Cronologia 30 giorni**: Storage locale sicuro
+- **Statistiche crescita**: Crescita media giornaliera
+
+### 💾 **Salvataggio Automatico**
 - I dati vengono salvati automaticamente sul dispositivo
 - I confronti precedenti vengono mantenuti per analisi future
+- **Nuovo**: History tracking con timestamp precisi
 
-### Esportazione
+### 📤 **Esportazione**
 - Tutti i dati possono essere visualizzati e copiati
 - I link diretti ai profili Instagram sono disponibili per ogni utente
+- **Nuovo**: Export con Chrome Extension include date precise
 
-### Privacy
+### 🔒 **Privacy**
 - Tutti i dati vengono elaborati localmente sul tuo dispositivo
 - Nessun dato viene inviato a server esterni
 - I file vengono processati solo nella memoria dell'app
+- **Nuovo**: Cronologia salvata solo in locale
+
+### 📈 **Guide Specializzate**
+- [**Tracking Features**](TRACKING_FEATURES.md): Sistema di monitoraggio crescita
+- [**Security Guide**](SECURITY_GUIDE.md): Protezione dati personali
+- [**Distribution Guide**](DISTRIBUTION_GUIDE.md): Condivisione con amici
 
 ## Risoluzione Problemi
 
