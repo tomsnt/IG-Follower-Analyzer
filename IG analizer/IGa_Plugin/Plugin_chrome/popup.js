@@ -1,9 +1,8 @@
-// popup.js - Dual Mode: Followers & Following Collection
-class InstagramAnalyzerPopup {
+// popup.js - Manual Selection Mode
+class InstagramFollowersPopup {
     constructor() {
         this.followers = [];
-        this.following = [];
-        this.profileName = '';
+        this.isObserving = false;
         this.initializeElements();
         this.bindEvents();
         this.checkInstagramTab();
@@ -11,30 +10,21 @@ class InstagramAnalyzerPopup {
     }
 
     initializeElements() {
-        // Profile info
-        this.profileNameElement = document.getElementById('profileName');
-        
-        // Followers section
+        this.startBtn = document.getElementById('startBtn');
+        this.stopBtn = document.getElementById('stopBtn');
+        this.downloadBtn = document.getElementById('downloadBtn');
+        this.statusDiv = document.getElementById('status');
+        this.progressDiv = document.getElementById('progress');
+        this.progressFill = document.getElementById('progressFill');
+        this.progressText = document.getElementById('progressText');
+        this.statsDiv = document.getElementById('stats');
         this.followersCount = document.getElementById('followersCount');
-        this.followersStatus = document.getElementById('followersStatus');
-        this.startFollowersBtn = document.getElementById('startFollowersBtn');
-        this.downloadFollowersBtn = document.getElementById('downloadFollowersBtn');
-        
-        // Following section
-        this.followingCount = document.getElementById('followingCount');
-        this.followingStatus = document.getElementById('followingStatus');
-        this.startFollowingBtn = document.getElementById('startFollowingBtn');
-        this.downloadFollowingBtn = document.getElementById('downloadFollowingBtn');
     }
 
     bindEvents() {
-        // Action buttons
-        this.startFollowersBtn.addEventListener('click', () => this.startCollection('followers'));
-        this.startFollowingBtn.addEventListener('click', () => this.startCollection('following'));
-        
-        // Download buttons
-        this.downloadFollowersBtn.addEventListener('click', () => this.downloadData('followers'));
-        this.downloadFollowingBtn.addEventListener('click', () => this.downloadData('following'));
+        this.startBtn.addEventListener('click', () => this.startSelection());
+        this.stopBtn.addEventListener('click', () => this.stopObserving());
+        this.downloadBtn.addEventListener('click', () => this.downloadFollowers());
     }
 
     async checkInstagramTab() {
@@ -42,80 +32,34 @@ class InstagramAnalyzerPopup {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             
             if (!tab.url.includes('instagram.com')) {
-                this.updateStatus('Naviga su Instagram per usare questa estensione', 'error');
-                this.disableAllButtons();
+                this.updateStatus('Navigate to Instagram to use this extension', 'error');
+                this.startBtn.disabled = true;
                 return;
             }
 
-            // Extract profile name from URL
-            this.profileName = this.extractProfileName(tab.url);
-            if (this.profileNameElement) {
-                this.profileNameElement.textContent = this.profileName || 'Sconosciuto';
-            }
-            
-            // Notify content script of profile name
-            chrome.tabs.sendMessage(tab.id, { 
-                action: 'setMode', 
-                mode: 'followers', // Default mode
-                profileName: this.profileName 
-            }, (response) => {
-                // Ignore errors if content script isn't ready
-            });
-            
+            this.updateStatus('Ready to collect followers', 'ready');
+            this.startBtn.textContent = '🎯 Start Selection Mode';
         } catch (error) {
-            this.updateStatus('Errore nel controllo della scheda', 'error');
+            this.updateStatus('Error checking tab', 'error');
             console.error('Error checking tab:', error);
         }
     }
 
-    extractProfileName(url) {
-        try {
-            const urlObj = new URL(url);
-            const path = urlObj.pathname;
-            
-            // Remove leading/trailing slashes
-            const cleanPath = path.replace(/^\/+|\/+$/g, '');
-            
-            // If it's a profile URL like /username/
-            if (cleanPath && !cleanPath.includes('/') && cleanPath !== '') {
-                return cleanPath;
-            }
-            
-            // If it's a full profile URL like /username/followers or /username/following
-            const pathParts = cleanPath.split('/');
-            if (pathParts.length > 0 && pathParts[0] !== '') {
-                return pathParts[0];
-            }
-            
-            return '';
-        } catch (error) {
-            console.error('Error extracting profile name:', error);
-            return '';
-        }
-    }
-
-    disableAllButtons() {
-        this.startFollowersBtn.disabled = true;
-        this.startFollowingBtn.disabled = true;
-    }
-
-    async startCollection(mode) {
+    async startSelection() {
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             
             // Send message to content script to start selection mode
-            chrome.tabs.sendMessage(tab.id, { 
-                action: 'startSelection', 
-                mode: mode,
-                profileName: this.profileName 
-            }, (response) => {
+            chrome.tabs.sendMessage(tab.id, { action: 'startSelection' }, (response) => {
                 if (chrome.runtime.lastError) {
-                    this.updateStatus('Errore: Ricarica la pagina Instagram', 'error', mode);
+                    this.updateStatus('Error: Please refresh Instagram page', 'error');
                     return;
                 }
                 
                 if (response && response.success) {
-                    this.updateStatus(`Modalità ${mode === 'followers' ? 'Followers' : 'Following'} attiva! Clicca sul popup di Instagram.`, 'working', mode);
+                    this.updateStatus('Look for the widget on Instagram! Click on followers popup.', 'working');
+                    this.startBtn.style.display = 'none';
+                    this.stopBtn.style.display = 'block';
                     
                     // Close popup so user can interact with the page
                     setTimeout(() => window.close(), 1000);
@@ -123,37 +67,52 @@ class InstagramAnalyzerPopup {
             });
 
         } catch (error) {
-            this.updateStatus('Errore nell\'avvio della raccolta', 'error', mode);
-            console.error('Error starting collection:', error);
+            this.updateStatus('Error starting selection', 'error');
+            console.error('Error starting selection:', error);
+        }
+    }
+
+    async stopObserving() {
+        try {
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+            
+            chrome.tabs.sendMessage(tab.id, { action: 'stopObserving' }, (response) => {
+                this.resetUI();
+                this.updateStatus('Observation stopped', 'ready');
+            });
+
+        } catch (error) {
+            this.resetUI();
+            this.updateStatus('Stopped', 'ready');
         }
     }
 
     startPeriodicUpdate() {
-        // Update counts every 2 seconds
+        // Update follower count every 2 seconds
         setInterval(() => {
-            this.updateCounts();
+            this.updateFollowerCount();
         }, 2000);
     }
 
-    async updateCounts() {
+    async updateFollowerCount() {
         try {
             const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             
-            // Get current data from content script
-            chrome.tabs.sendMessage(tab.id, { action: 'getData' }, (response) => {
-                if (response) {
-                    if (response.mode === 'followers') {
-                        this.followersCount.textContent = response.count || 0;
-                        this.followers = response.data || [];
-                        if (response.count > 0) {
-                            this.downloadFollowersBtn.style.display = 'block';
-                        }
-                    } else if (response.mode === 'following') {
-                        this.followingCount.textContent = response.count || 0;
-                        this.following = response.data || [];
-                        if (response.count > 0) {
-                            this.downloadFollowingBtn.style.display = 'block';
-                        }
+            chrome.tabs.sendMessage(tab.id, { action: 'getFollowers' }, (response) => {
+                if (response && typeof response.count === 'number') {
+                    this.followers = response.followers || [];
+                    this.followersCount.textContent = response.count;
+                    this.progressText.textContent = `${response.count} followers collected`;
+                    
+                    // Update progress bar
+                    const progress = Math.min(95, response.count * 0.1);
+                    this.progressFill.style.width = `${progress}%`;
+                    
+                    // Show download button if we have followers
+                    if (response.count > 0) {
+                        this.downloadBtn.style.display = 'block';
+                        this.progressDiv.style.display = 'block';
+                        this.statsDiv.style.display = 'block';
                     }
                 }
             });
@@ -163,47 +122,58 @@ class InstagramAnalyzerPopup {
         }
     }
 
-    async downloadData(mode) {
+    async downloadFollowers() {
         try {
-            const data = mode === 'followers' ? this.followers : this.following;
+            const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
             
-            if (data.length === 0) {
-                this.updateStatus(`Nessun ${mode} da scaricare`, 'error', mode);
-                return;
-            }
-            
-            this.performDownload(data, mode);
+            chrome.tabs.sendMessage(tab.id, { action: 'getFollowers' }, (response) => {
+                if (response && response.followers && response.followers.length > 0) {
+                    this.followers = response.followers;
+                    this.performDownload();
+                } else {
+                    this.updateStatus('No followers to download', 'error');
+                }
+            });
 
         } catch (error) {
-            this.updateStatus(`Errore nel download dei ${mode}`, 'error', mode);
+            this.updateStatus('Error downloading followers', 'error');
         }
     }
 
-    performDownload(data, mode) {
-        if (data.length === 0) {
-            this.updateStatus(`Nessun ${mode} da scaricare`, 'error', mode);
+    performDownload() {
+        if (this.followers.length === 0) {
+            this.updateStatus('No followers to download', 'error');
             return;
         }
 
-        // Create filename with profile name
-        const profilePart = this.profileName ? `${this.profileName}_` : '';
-        const filename = `${profilePart}${mode}_data.csv`;
+        const format = document.querySelector('input[name="format"]:checked')?.value || 'csv';
+        let content, filename, mimeType;
 
-        // Convert data to CSV format
-        const headers = ['Username', 'Display Name', 'Profile URL', 'Profile Pic URL', 'Collected At'];
-        const csvContent = [
-            headers.join(','),
-            ...data.map(([username, userData]) => [
-                `"${userData.username}"`,
-                `"${userData.displayName || ''}"`,
-                `"${userData.profileUrl}"`,
-                `"${userData.profilePicUrl || ''}"`,
-                `"${userData.timestamp || userData.collectedAt || ''}"`
-            ].join(','))
-        ].join('\n');
+        if (format === 'json') {
+            content = JSON.stringify(this.followers, null, 2);
+            filename = `instagram_followers_${new Date().toISOString().split('T')[0]}.json`;
+            mimeType = 'application/json';
+        } else {
+            // CSV format
+            const headers = ['Username', 'Display Name', 'Profile URL', 'Profile Pic URL', 'Collected At'];
+            const csvContent = [
+                headers.join(','),
+                ...this.followers.map(f => [
+                    `"${f.username}"`,
+                    `"${f.displayName || ''}"`,
+                    `"${f.profileUrl}"`,
+                    `"${f.profilePicUrl || ''}"`,
+                    `"${f.timestamp}"`
+                ].join(','))
+            ].join('\n');
+            
+            content = csvContent;
+            filename = `instagram_followers_${new Date().toISOString().split('T')[0]}.csv`;
+            mimeType = 'text/csv';
+        }
 
         try {
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const blob = new Blob([content], { type: mimeType });
             const url = URL.createObjectURL(blob);
             
             chrome.downloads.download({
@@ -212,25 +182,27 @@ class InstagramAnalyzerPopup {
                 saveAs: true
             });
 
-            this.updateStatus(`Scaricato ${data.length} ${mode}!`, 'ready', mode);
+            this.updateStatus(`Downloaded ${this.followers.length} followers!`, 'ready');
         } catch (error) {
-            this.updateStatus('Errore nel download', 'error', mode);
+            this.updateStatus('Download error', 'error');
             console.error('Download error:', error);
         }
     }
 
-    updateStatus(message, type, mode = null) {
-        const targetMode = mode || 'followers'; // Default to followers if no mode specified
-        const statusElement = targetMode === 'followers' ? this.followersStatus : this.followingStatus;
-        
-        if (statusElement) {
-            statusElement.textContent = message;
-            // You could add color coding here based on type
-        }
+    updateStatus(message, type) {
+        this.statusDiv.textContent = message;
+        this.statusDiv.className = `status ${type}`;
+    }
+
+    resetUI() {
+        this.isObserving = false;
+        this.startBtn.style.display = 'block';
+        this.stopBtn.style.display = 'none';
+        this.startBtn.textContent = '🎯 Start Selection Mode';
     }
 }
 
 // Initialize popup when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-    new InstagramAnalyzerPopup();
+    new InstagramFollowersPopup();
 });

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <style>
         body {
-            width: 450px;
+            width: 350px;
             padding: 20px;
             font-family: Arial, sans-serif;
         }
@@ -46,39 +46,12 @@
             cursor: pointer;
             margin: 10px 0;
         }
-        .mode-btn.active {
-            background-color: #E4405F !important;
-            color: white !important;
-        }
-        .action-btn {
-            width: 100%;
-            padding: 12px;
-            background-color: #E4405F;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            margin: 8px 0;
-            font-weight: 600;
-        }
-        .action-btn:hover {
+        button:hover {
             background-color: #d63384;
         }
-        .download-btn {
-            width: 100%;
-            padding: 10px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            margin: 8px 0;
-            font-weight: 600;
-        }
-        .download-btn:hover {
-            background-color: #218838;
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
         .progress {
             margin: 10px 0;
@@ -111,44 +84,48 @@
 </head>
 <body>
     <div class="header">
-        <div class="logo">📷 Instagram Analyzer</div>
-        <div style="font-size: 12px; color: #666; margin-top: 5px;">Modalità Dual-Mode</div>
-        <div id="profileInfo" style="font-size: 14px; color: #E4405F; margin-top: 8px; font-weight: bold;">Profilo: <span id="profileName">Sconosciuto</span></div>
+        <div class="logo">📷 Instagram Followers</div>
     </div>
     
-    <div class="dual-mode-container" style="display: flex; gap: 15px; margin-top: 20px;">
-        <!-- Followers Column -->
-        <div class="mode-column" style="flex: 1;">
-            <div class="column-header" style="text-align: center; margin-bottom: 15px;">
-                <div style="font-size: 16px; font-weight: bold; color: #E4405F;">👥 Followers</div>
-            </div>
-            
-            <div class="stats-card" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <div style="font-size: 14px; font-weight: bold;">Raccolti</div>
-                <div id="followersCount" style="font-size: 24px; font-weight: bold; margin: 5px 0;">0</div>
-                <div id="followersStatus" style="font-size: 11px; opacity: 0.9;">Pronto</div>
-            </div>
-            
-            <button id="startFollowersBtn" class="action-btn">🎯 Seleziona</button>
-            <button id="downloadFollowersBtn" class="download-btn" style="display: none;">📥 CSV</button>
-        </div>
-        
-        <!-- Following Column -->
-        <div class="mode-column" style="flex: 1;">
-            <div class="column-header" style="text-align: center; margin-bottom: 15px;">
-                <div style="font-size: 16px; font-weight: bold; color: #E4405F;">❤️ Following</div>
-            </div>
-            
-            <div class="stats-card" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; padding: 15px; border-radius: 10px; margin-bottom: 10px; text-align: center;">
-                <div style="font-size: 14px; font-weight: bold;">Raccolti</div>
-                <div id="followingCount" style="font-size: 24px; font-weight: bold; margin: 5px 0;">0</div>
-                <div id="followingStatus" style="font-size: 11px; opacity: 0.9;">Pronto</div>
-            </div>
-            
-            <button id="startFollowingBtn" class="action-btn">🎯 Seleziona</button>
-            <button id="downloadFollowingBtn" class="download-btn" style="display: none;">📥 CSV</button>
-        </div>
+    <div class="warning" style="background-color: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; margin-bottom: 15px; font-size: 12px; border-left: 4px solid #ffc107;">
+        <strong>✅ MODALITÀ SICURA:</strong> Questo plugin raccoglie i dati mentre tu scrolli manualmente. Nessun rischio di ban!
     </div>
+    
+    <div id="status" class="status ready">
+        Pronto per raccogliere i followers
+    </div>
+    
+    <div class="format-selection">
+        <label>
+            <input type="radio" name="format" value="json" checked> JSON
+        </label>
+        <label>
+            <input type="radio" name="format" value="csv"> CSV
+        </label>
+    </div>
+    
+    <div class="stealth-options" style="margin: 15px 0; padding: 10px; background-color: #d4edda; border-radius: 5px;">
+        <label style="font-weight: bold; display: block; margin-bottom: 10px;">�️ Modalità Passiva Attiva:</label>
+        <p style="margin: 5px 0; font-size: 12px;">• Tu scrolli manualmente</p>
+        <p style="margin: 5px 0; font-size: 12px;">• Il plugin raccoglie automaticamente</p>
+        <p style="margin: 5px 0; font-size: 12px;">• Zero rischio di rilevamento</p>
+    </div>
+    
+    <button id="startBtn">Inizia Raccolta</button>
+    <button id="stopBtn" style="display: none;" disabled>Ferma Raccolta</button>
+    
+    <div id="progress" class="progress" style="display: none;">
+        <div class="progress-bar">
+            <div id="progressFill" class="progress-fill"></div>
+        </div>
+        <div id="progressText">0 followers trovati</div>
+    </div>
+    
+    <div id="stats" class="stats" style="display: none;">
+        <strong>Followers trovati: <span id="followersCount">0</span></strong>
+    </div>
+    
+    <button id="downloadBtn" style="display: none;">Scarica Lista</button>
     
     <script src="popup.js"></script>
 </body>

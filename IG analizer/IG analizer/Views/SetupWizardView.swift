@@ -48,69 +48,68 @@ struct SetupWizardView: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Header and navigation can go here if needed
-            if currentStep == 0 {
-                WelcomeStepView()
-            } else if currentStep == 1 {
-                ChromeDetectionStepView(isChromeInstalled: $isChromeInstalled)
-            } else if currentStep == 2 {
-                OperationModeStepView(selectedMode: $selectedOperationMode)
-            } else if currentStep == 3 {
-                if selectedOperationMode == .installExtension {
-                    InstallMethodStepView(selectedMethod: $selectedInstallMethod, isChromeInstalled: isChromeInstalled)
-                } else if selectedOperationMode == .analyzeFollowers {
-                    AnalysisModeView()
-                } else if selectedOperationMode == .compareFollowers {
-                    ComparisonModeView()
-                }
-            } else if currentStep == 4 {
-                if selectedInstallMethod == .manual {
-                    ManualInstallInstructionsView()
-                } else if selectedInstallMethod == .crxFile {
-                    CrxInstallInstructionsView(showingFileDialog: $showingFileDialog)
-                } else {
-                    WebStoreInstructionsView()
-                }
-            }
-        }
-        .frame(maxWidth: .infinity)
-        .padding()
-        // Navigation Buttons
-        HStack(spacing: 12) {
-            Spacer()
-            let isDisabled = currentStep == 2 && (selectedOperationMode == nil || selectedOperationMode?.isAvailable == false)
-            // Mostra il pulsante Avanti solo per i primi 3 step, non per l'ultimo
-            if currentStep < 4 {
-                Button("Next") {
-                    currentStep += 1
-                }
-                .disabled(isDisabled)
-                .buttonStyle(.borderedProminent)
-            }
-        }
-        .onChange(of: selectedOperationMode) {
-            // Navigazione automatica quando viene selezionato un metodo
-            if let newValue = selectedOperationMode {
-                if newValue == .installExtension {
-                    // Per l'installazione dell'estensione, vai al passo successivo per scegliere il metodo
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        currentStep += 1
+        ZStack(alignment: .topTrailing) {
+            VStack(spacing: 0) {
+                // Header and navigation can go here if needed
+                if currentStep == 0 {
+                    WelcomeStepView()
+                } else if currentStep == 1 {
+                    ChromeDetectionStepView(isChromeInstalled: $isChromeInstalled)
+                } else if currentStep == 2 {
+                    OperationModeStepView(selectedMode: $selectedOperationMode)
+                } else if currentStep == 3 {
+                    if selectedOperationMode == .installExtension {
+                        InstallMethodStepView(selectedMethod: $selectedInstallMethod, isChromeInstalled: isChromeInstalled)
+                    } else if selectedOperationMode == .analyzeFollowers {
+                        AnalysisModeView()
+                    } else if selectedOperationMode == .compareFollowers {
+                        ComparisonModeView()
                     }
-                } else {
-                    // Per analisi e confronto, segna il setup come completato
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        UserDefaults.standard.set(true, forKey: "hasCompletedSetup")
-                        UserDefaults.standard.set(newValue.rawValue, forKey: "selectedOperationMode")
-                        dismiss()
+                } else if currentStep == 4 {
+                    if selectedInstallMethod == .manual {
+                        ManualInstallInstructionsView()
+                    } else if selectedInstallMethod == .crxFile {
+                        CrxInstallInstructionsView(showingFileDialog: $showingFileDialog)
+                    } else {
+                        WebStoreInstructionsView()
                     }
                 }
             }
+            .frame(maxWidth: .infinity)
+            .padding()
+            
+            // Pulsante di chiusura (X) nell'angolo in alto a destra
+            Button(action: {
+                dismiss()
+            }) {
+                Image(systemName: "xmark.circle.fill")
+                    .font(.title2)
+                    .foregroundColor(.secondary)
+            }
+            .buttonStyle(PlainButtonStyle())
+            .padding(.trailing, 16)
+            .padding(.top, 16)
+            
+            // Navigation Buttons
+            VStack {
+                Spacer()
+                HStack(spacing: 12) {
+                    Spacer()
+                    let isDisabled = currentStep == 2 && (selectedOperationMode == nil || selectedOperationMode?.isAvailable == false)
+                    // Mostra il pulsante Avanti solo per i primi 3 step, non per l'ultimo
+                    if currentStep < 4 {
+                        Button("Next") {
+                            currentStep += 1
+                        }
+                        .disabled(isDisabled)
+                        .buttonStyle(.borderedProminent)
+                    }
+                }
+                .padding()
+            }
         }
-        .padding()
         .fixedSize(horizontal: false, vertical: false)
-    }
-
+}
 
 struct WelcomeStepView: View {
     var body: some View {

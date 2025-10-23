@@ -1,29 +1,34 @@
-// Instagram Analyzer - Dual Mode: Followers & Following Collection
-class InstagramAnalyzer {
+// Instagram Followers Scraper - Manual Selection Mode
+// User manually selects the followers popup, then auto-collects
+
+class InstagramFollowersSelector {
     constructor() {
         this.followers = new Map();
         this.following = new Map();
-        this.currentMode = null; // 'followers' or 'following'
+        this.mode = null; // 'followers' or 'following'
         this.isSelectionMode = false;
         this.isObserving = false;
+        this.paused = false;
         this.selectedContainer = null;
         this.mutationObserver = null;
         this.counterWidget = null;
-        this.profileName = '';
-        
+        this.profileName = this.extractProfileNameFromURL();
         console.log('🎯 Instagram Analyzer initialized');
         this.init();
     }
 
     init() {
+        this.widgetVisible = false; // Imposta il widget inizialmente nascosto
+        const widget = document.getElementById('instagram-analyzer-widget');
+        if (widget) {
+            widget.style.display = 'none';
+        }
         // Create floating counter widget
         this.createCounterWidget();
         
         // Listen for messages from popup/background
         chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             if (request.action === 'startSelection') {
-                this.currentMode = request.mode;
-                this.profileName = request.profileName || '';
                 this.startSelectionMode();
                 sendResponse({ success: true });
             } else if (request.action === 'stopObserving') {
@@ -34,151 +39,211 @@ class InstagramAnalyzer {
                     followers: Array.from(this.followers.values()),
                     count: this.followers.size
                 });
-            } else if (request.action === 'getFollowing') {
-                sendResponse({
-                    following: Array.from(this.following.values()),
-                    count: this.following.size
-                });
             } else if (request.action === 'clearData') {
                 this.followers.clear();
-                this.following.clear();
                 this.updateCounter();
                 sendResponse({ success: true });
             }
         });
+        this.createToggleButton();
+    }
+
+    createToggleButton() {
+        this.toggleBtn = document.createElement('div');
+        this.toggleBtn.id = 'ig-analyzer-toggle-btn';
+        this.toggleBtn.style.position = 'fixed';
+        this.toggleBtn.style.top = '18px';
+        this.toggleBtn.style.right = '18px';
+        this.toggleBtn.style.zIndex = '1000000';
+        this.toggleBtn.style.width = '48px';
+        this.toggleBtn.style.height = '48px';
+        this.toggleBtn.style.cursor = 'pointer';
+        this.toggleBtn.style.background = 'rgba(255,255,255,0.0)';
+        this.toggleBtn.style.display = 'flex';
+        this.toggleBtn.style.alignItems = 'center';
+        this.toggleBtn.style.justifyContent = 'center';
+        const iconUrl = chrome.runtime.getURL('Plugin_chrome/icons/IGa_icons-wnobg.png');
+        this.toggleBtn.innerHTML = `<img src="${iconUrl}" alt="Toggle" style="width:40px;height:40px;">`;
+        document.body.appendChild(this.toggleBtn);
+
+        this.toggleBtn.onclick = () => {
+            this.widgetVisible = !this.widgetVisible;
+            const widget = document.getElementById('instagram-analyzer-widget');
+            if (widget) {
+                widget.style.display = this.widgetVisible ? 'block' : 'none';
+            } else {
+                console.error('Widget not found');
+            }
+        };
     }
 
     createCounterWidget() {
-        // Create floating widget in top-right corner
         this.counterWidget = document.createElement('div');
         this.counterWidget.id = 'instagram-analyzer-widget';
         this.counterWidget.innerHTML = `
-            <div style="
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                background: linear-gradient(45deg, #405de6, #5851db, #833ab4, #c13584, #e1306c, #fd1d1d);
-                color: white;
-                padding: 15px;
-                border-radius: 12px;
-                font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-                font-size: 14px;
-                font-weight: 600;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                z-index: 999999;
-                cursor: pointer;
-                user-select: none;
-                transition: transform 0.2s ease;
-                min-width: 220px;
-                text-align: center;
-            " onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
-                <div id="widget-title" style="font-size: 16px; margin-bottom: 8px;">📊 Instagram Analyzer</div>
-                <div id="widget-profile" style="font-size: 12px; opacity: 0.9; margin-bottom: 8px;">Profilo: <span id="profile-name">Sconosciuto</span></div>
-                <div id="widget-counters" style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 18px; font-weight: bold;" id="followers-count">0</div>
-                        <div style="font-size: 10px; opacity: 0.8;">Followers</div>
+            <div style="position: fixed; top: 24px; right: 24px; background: transparent; color: #fff; border-radius: 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.18); z-index: 999999; padding: 0; min-width: 420px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; pointer-events: auto;">
+                <div style="display: flex; gap: 32px; justify-content: center; padding: 24px 24px 24px 24px;">
+                    <div id="followers-panel" style="background: #5a5a5a; border-radius: 32px; width: 150px; max-width: 150px; max-height: 160px; padding: 0 0 0px 0; display: flex; flex-direction: column; align-items: center;">
+                        <div style="color: #fff; font-size: 14px; font-weight: 500; padding: 12px 0 0 0; text-align: center; border-top-left-radius: 32px; border-top-right-radius: 32px;">Followers</div>
+                        <div style="background: #ededed; border-radius: 24px; margin-top: 8px; width: 90%; display: flex; flex-direction: column; align-items: center; padding: 12px 0 0 0;">
+                            <div id="followers-count" style="font-size: 14px; font-weight: 600; color: #111; margin-bottom: 8px;">0</div>
+                            <div id="followers-actions" style="display: flex; gap: 10px; justify-content: center; align-items: center;"></div>
+                        </div>
                     </div>
-                    <div style="text-align: center;">
-                        <div style="font-size: 18px; font-weight: bold;" id="following-count">0</div>
-                        <div style="font-size: 10px; opacity: 0.8;">Following</div>
+                    <div id="following-panel" style="background: #5a5a5a; border-radius: 32px; width: 150px; max-width: 150px; max-height: 160px; padding: 0 0 0px 0; display: flex; flex-direction: column; align-items: center;">
+                        <div style="color: #fff; font-size: 14px; font-weight: 500; padding: 12px 0 0 0; text-align: center; border-top-left-radius: 32px; border-top-right-radius: 32px;">Following</div>
+                        <div style="background: #ededed; border-radius: 24px; margin-top: 8px; width: 90%; display: flex; flex-direction: column; align-items: center; padding: 12px 0 0 0;">
+                            <div id="following-count" style="font-size: 14px; font-weight: 600; color: #111; margin-bottom: 8px;">0</div>
+                            <div id="following-actions" style="display: flex; gap: 10px; justify-content: center; align-items: center;"></div>
+                        </div>
                     </div>
-                </div>
-                <div id="widget-status">🎯 Clicca per selezionare</div>
-                <div id="widget-buttons" style="margin-top: 10px; display: none;">
-                    <button id="export-btn" style="
-                        background: rgba(255,255,255,0.2);
-                        border: 1px solid rgba(255,255,255,0.3);
-                        color: white;
-                        padding: 6px 12px;
-                        border-radius: 6px;
-                        font-size: 12px;
-                        cursor: pointer;
-                        margin-right: 8px;
-                    ">📥 Esporta CSV</button>
-                    <button id="stop-btn" style="
-                        background: rgba(255,255,255,0.2);
-                        border: 1px solid rgba(255,255,255,0.3);
-                        color: white;
-                        padding: 6px 12px;
-                        border-radius: 6px;
-                        font-size: 12px;
-                        cursor: pointer;
-                    ">⏹️ Ferma</button>
                 </div>
             </div>
         `;
-        
         document.body.appendChild(this.counterWidget);
-        
-        // Add event listeners
-        this.counterWidget.addEventListener('click', () => {
-            if (this.isSelectionMode) {
-                this.startSelectionMode();
-            } else if (!this.isObserving) {
-                this.startSelectionMode();
-            }
-        });
-        
-        // Export button
-        document.addEventListener('click', (e) => {
-            if (e.target.id === 'export-btn') {
-                this.exportData();
-            } else if (e.target.id === 'stop-btn') {
-                this.stopObserving();
-            }
-        });
+        this.renderActions();
     }
 
-    updateWidget() {
-        if (!this.counterWidget) return;
-        
-        const followersCount = this.followers.size;
-        const followingCount = this.following.size;
-        
-        // Update profile name
-        const profileElement = this.counterWidget.querySelector('#profile-name');
-        if (profileElement) {
-            profileElement.textContent = this.profileName || 'Sconosciuto';
-        }
-        
-        // Update counters
-        const followersElement = this.counterWidget.querySelector('#followers-count');
-        const followingElement = this.counterWidget.querySelector('#following-count');
-        if (followersElement) followersElement.textContent = followersCount;
-        if (followingElement) followingElement.textContent = followingCount;
-        
-        // Update status based on current mode and state
-        const statusElement = this.counterWidget.querySelector('#widget-status');
-        const buttonsElement = this.counterWidget.querySelector('#widget-buttons');
-        
-        if (this.isSelectionMode) {
-            statusElement.textContent = `🎯 Seleziona popup ${this.currentMode === 'followers' ? 'Followers' : 'Following'}`;
-            if (buttonsElement) buttonsElement.style.display = 'none';
-        } else if (this.isObserving) {
-            statusElement.textContent = `� Raccolta ${this.currentMode === 'followers' ? 'Followers' : 'Following'}...`;
-            if (buttonsElement) buttonsElement.style.display = 'block';
+    updateCounter() {
+        const followersCount = document.getElementById('followers-count');
+        const followingCount = document.getElementById('following-count');
+        if (followersCount) followersCount.textContent = this.followers.size;
+        if (followingCount) followingCount.textContent = this.following.size;
+        this.renderActions();
+    }
+
+    renderActions() {
+        // Followers panel
+        const followersActions = this.counterWidget.querySelector('#followers-actions');
+        followersActions.innerHTML = '';
+        if (!this.isObserving || this.mode !== 'followers') {
+            followersActions.innerHTML = `<button id="analyze-followers-btn" style="background: linear-gradient(180deg, #D53D85 0%, #4E2FD1 100%); color: #fff; font-size: 14px; font-weight: 500; border: none; border-radius: 18px; padding: 6px 16px; min-width: 80px; margin-bottom: 8px; cursor: pointer;">Analizza</button>`;
         } else {
-            statusElement.textContent = `✅ ${this.currentMode === 'followers' ? 'Followers' : 'Following'} completato`;
-            if (buttonsElement) buttonsElement.style.display = 'block';
+            const icon = this.paused
+                ? `<svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#d44a6a"/><polygon points="12,10 24,16 12,22" fill="#fff"/></svg>`
+                : `<svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#d44a6a"/><rect x="10" y="10" width="4" height="12" rx="2" fill="#fff"/><rect x="18" y="10" width="4" height="12" rx="2" fill="#fff"/></svg>`;
+            const exportIcon = `<svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#888"/><path d="M16 10v10M16 20l-5-5M16 20l5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+            const resetIcon = `<span style='font-size:22px;display:inline-block;vertical-align:middle;color:#111;'>&#x21BB;</span>`;
+            followersActions.innerHTML = `
+                <button id="pause-play-followers-btn" style="background: none; border: none; padding: 0 2px; margin-right: 8px; cursor: pointer;">${icon}</button>
+                <button id="reset-followers-btn" style="background: none; border: none; padding: 0 2px; margin-right: 8px; cursor: pointer;">${resetIcon}</button>
+                <button id="export-followers-btn" style="background: none; border: none; padding: 0 2px; cursor: pointer;">${exportIcon}</button>
+            `;
+        }
+        // Following panel
+        const followingActions = this.counterWidget.querySelector('#following-actions');
+        followingActions.innerHTML = '';
+        if (!this.isObserving || this.mode !== 'following') {
+            followingActions.innerHTML = `<button id="analyze-following-btn" style="background: linear-gradient(180deg, #D53D85 0%, #4E2FD1 100%); color: #fff; font-size: 14px; font-weight: 500; border: none; border-radius: 18px; padding: 6px 16px; min-width: 80px; margin-bottom: 8px; cursor: pointer;">Analizza</button>`;
+        } else {
+            const icon = this.paused
+                ? `<svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#4f7ae9"/><polygon points="12,10 24,16 12,22" fill="#fff"/></svg>`
+                : `<svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#4f7ae9"/><rect x="10" y="10" width="4" height="12" rx="2" fill="#fff"/><rect x="18" y="10" width="4" height="12" rx="2" fill="#fff"/></svg>`;
+            const exportIcon = `<svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#888"/><path d="M16 10v10M16 20l-5-5M16 20l5-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>`;
+            const resetIcon = `<span style='font-size:22px;display:inline-block;vertical-align:middle;color:#111;'>&#x21BB;</span>`;
+            followingActions.innerHTML = `
+                <button id="pause-play-following-btn" style="background: none; border: none; padding: 0 2px; margin-right: 8px; cursor: pointer;">${icon}</button>
+                <button id="reset-following-btn" style="background: none; border: none; padding: 0 2px; margin-right: 8px; cursor: pointer;">${resetIcon}</button>
+                <button id="export-following-btn" style="background: none; border: none; padding: 0 2px; cursor: pointer;">${exportIcon}</button>
+            `;
+        }
+        // Add reset event listeners
+        const resetFollowersBtn = this.counterWidget.querySelector('#reset-followers-btn');
+        if (resetFollowersBtn) {
+            resetFollowersBtn.onclick = () => {
+                this.followers.clear();
+                this.isObserving = false;
+                this.paused = false;
+                this.mode = null;
+                this.updateCounter();
+            };
+        }
+        const resetFollowingBtn = this.counterWidget.querySelector('#reset-following-btn');
+        if (resetFollowingBtn) {
+            resetFollowingBtn.onclick = () => {
+                this.following.clear();
+                this.isObserving = false;
+                this.paused = false;
+                this.mode = null;
+                this.updateCounter();
+            };
+        }
+        // Add event listeners
+        const analyzeFollowersBtn = this.counterWidget.querySelector('#analyze-followers-btn');
+        if (analyzeFollowersBtn) {
+            analyzeFollowersBtn.onclick = () => {
+                this.mode = 'followers';
+                this.startSelectionMode();
+            };
+        }
+        const analyzeFollowingBtn = this.counterWidget.querySelector('#analyze-following-btn');
+        if (analyzeFollowingBtn) {
+            analyzeFollowingBtn.onclick = () => {
+                this.mode = 'following';
+                this.startSelectionMode();
+            };
+        }
+        const pausePlayFollowersBtn = this.counterWidget.querySelector('#pause-play-followers-btn');
+        if (pausePlayFollowersBtn) {
+            pausePlayFollowersBtn.onclick = () => {
+                if (this.paused) {
+                    // resume
+                    this.paused = false;
+                    this.startObserving();
+                } else {
+                    // pause
+                    this.paused = true;
+                    if (this.mutationObserver) {
+                        this.mutationObserver.disconnect();
+                    }
+                }
+                this.updateCounter();
+            };
+        }
+        const pausePlayFollowingBtn = this.counterWidget.querySelector('#pause-play-following-btn');
+        if (pausePlayFollowingBtn) {
+            pausePlayFollowingBtn.onclick = () => {
+                if (this.paused) {
+                    // resume
+                    this.paused = false;
+                    this.startObserving();
+                } else {
+                    // pause
+                    this.paused = true;
+                    if (this.mutationObserver) {
+                        this.mutationObserver.disconnect();
+                    }
+                }
+                this.updateCounter();
+            };
+        }
+        const exportFollowersBtn = this.counterWidget.querySelector('#export-followers-btn');
+        if (exportFollowersBtn) {
+            exportFollowersBtn.onclick = () => {
+                this.exportData('followers');
+            };
+        }
+        const exportFollowingBtn = this.counterWidget.querySelector('#export-following-btn');
+        if (exportFollowingBtn) {
+            exportFollowingBtn.onclick = () => {
+                this.exportData('following');
+            };
         }
     }
 
     startSelectionMode() {
         this.isSelectionMode = true;
-        this.updateWidget();
-        
-        // Add visual indicator for selection
+        this.updateCounter();
         document.body.style.cursor = 'crosshair';
-        
-        // Create overlay to show hoverable elements
         this.createSelectionOverlay();
-        
-        console.log('🎯 Selection mode activated - click on the followers popup');
+        if (this.mode === 'following') {
+            console.log('🎯 Selection mode activated - click on the following popup');
+        } else {
+            console.log('🎯 Selection mode activated - click on the followers popup');
+        }
     }
 
     createSelectionOverlay() {
-        // Add hover effects to potential containers
         const hoverStyle = document.createElement('style');
         hoverStyle.id = 'selection-hover-style';
         hoverStyle.textContent = `
@@ -189,24 +254,17 @@ class InstagramAnalyzer {
             }
         `;
         document.head.appendChild(hoverStyle);
-        
-        // Add click listener to document
         this.selectionClickHandler = (e) => {
             e.preventDefault();
             e.stopPropagation();
             this.selectElement(e.target);
         };
-        
         this.selectionHoverHandler = (e) => {
-            // Remove previous highlights
             document.querySelectorAll('.selection-highlight').forEach(el => {
                 el.classList.remove('selection-highlight');
             });
-            
-            // Add highlight to current element
             e.target.classList.add('selection-highlight');
         };
-        
         document.addEventListener('click', this.selectionClickHandler, true);
         document.addEventListener('mouseover', this.selectionHoverHandler, true);
     }
@@ -215,21 +273,16 @@ class InstagramAnalyzer {
         // Stop selection mode
         this.isSelectionMode = false;
         document.body.style.cursor = '';
-        
         // Remove selection overlay
         document.removeEventListener('click', this.selectionClickHandler, true);
         document.removeEventListener('mouseover', this.selectionHoverHandler, true);
-        
         const style = document.getElementById('selection-hover-style');
         if (style) style.remove();
-        
         document.querySelectorAll('.selection-highlight').forEach(el => {
             el.classList.remove('selection-highlight');
         });
-        
         // Find the scrollable container (go up the DOM tree)
         this.selectedContainer = this.findScrollableContainer(element);
-        
         if (this.selectedContainer) {
             console.log('✅ Selected container:', this.selectedContainer);
             this.startObserving();
@@ -273,12 +326,17 @@ class InstagramAnalyzer {
     }
 
     startObserving() {
-        if (this.isObserving || !this.selectedContainer) return;
+        if (!this.selectedContainer) return;
+        
+        if (this.mutationObserver) {
+            this.mutationObserver.disconnect();
+        }
         
         this.isObserving = true;
-        this.updateWidget();
+        this.paused = false;
+        this.updateCounter();
         
-        console.log(`👀 Starting to observe ${this.currentMode} in selected container`);
+        console.log('👀 Starting to observe followers in selected container');
         
         // Initial scan
         this.scanForFollowers();
@@ -311,36 +369,36 @@ class InstagramAnalyzer {
     scanForFollowers() {
         if (!this.selectedContainer) return;
         
-        // Determine mode based on current mode setting
-        const targetMap = this.currentMode === 'followers' ? this.followers : this.following;
-        
-        // Find all links that look like profile links
         const profileLinks = this.selectedContainer.querySelectorAll('a[href^="/"]');
         
         profileLinks.forEach(link => {
             const href = link.getAttribute('href');
             
-            // Skip non-profile links
             if (!href || href === '/' || 
                 href.includes('/p/') || href.includes('/reel/') || 
                 href.includes('/explore/') || href.includes('/stories/')) {
                 return;
             }
             
-            // Extract username from href
             const username = href.replace(/^\//, '').replace(/\/$/, '');
             if (!username || username.length < 1) return;
             
-            // Check if we already have this user in the current mode
-            if (targetMap.has(username)) return;
-            
-            // Extract additional data
-            const userData = this.extractFollowerData(link, username);
-            
-            if (userData) {
-                targetMap.set(username, userData);
-                this.updateWidget();
-                console.log(`👤 New ${this.currentMode}: ${username}`);
+            if (this.mode === 'followers') {
+                if (this.followers.has(username)) return;
+                const data = this.extractFollowerData(link, username);
+                if (data) {
+                    this.followers.set(username, data);
+                    this.updateCounter();
+                    console.log(`👤 New follower: ${username}`);
+                }
+            } else if (this.mode === 'following') {
+                if (this.following.has(username)) return;
+                const data = this.extractFollowerData(link, username);
+                if (data) {
+                    this.following.set(username, data);
+                    this.updateCounter();
+                    console.log(`👤 New following: ${username}`);
+                }
             }
         });
     }
@@ -386,62 +444,51 @@ class InstagramAnalyzer {
     stopObserving() {
         this.isObserving = false;
         this.isSelectionMode = false;
-        
+        this.paused = false;
         if (this.mutationObserver) {
             this.mutationObserver.disconnect();
             this.mutationObserver = null;
         }
-        
-        this.updateWidget();
-        console.log(`🏁 Stopped observing. Total ${this.currentMode}: ${this.currentMode === 'followers' ? this.followers.size : this.following.size}`);
+        this.updateCounter();
+        setTimeout(() => this.updateCounter(), 100); // Ensure UI updates after DOM changes
+        console.log(`🏁 Stopped observing. Total followers: ${this.followers.size}`);
     }
 
-    exportData() {
-        const data = this.currentMode === 'followers' ? this.followers : this.following;
-        const filename = `${this.profileName}_${this.currentMode}_data.csv`;
-        
-        if (data.size === 0) {
-            alert(`Nessun dato ${this.currentMode} da esportare`);
+    exportData(type) {
+        const dataMap = type === 'followers' ? this.followers : this.following;
+        if (dataMap.size === 0) {
+            alert(`No ${type} collected yet!`);
             return;
         }
-        
-        // Convert to CSV
-        const csvContent = this.convertToCSV(data);
-        
-        // Download file
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const dateStr = new Date().toISOString().split('T')[0];
+        const filename = `${this.profileName}_${type}_${dateStr}.csv`;
+        const csvHeader = 'Username,Display Name,Profile URL,Profile Pic URL,Collected At\n';
+        const csvContent = Array.from(dataMap.values())
+            .map(f => `"${f.username}","${f.displayName}","${f.profileUrl}","${f.profilePicUrl}","${f.timestamp}"`)
+            .join('\n');
+        const csvData = csvHeader + csvContent;
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement('a');
-        const url = URL.createObjectURL(blob);
-        link.setAttribute('href', url);
-        link.setAttribute('download', filename);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
+        link.href = URL.createObjectURL(blob);
+        link.download = filename;
         link.click();
-        document.body.removeChild(link);
-        
-        console.log(`Esportati ${data.size} ${this.currentMode} in ${filename}`);
+        console.log(`📥 Exported ${dataMap.size} ${type} to ${filename}`);
     }
-
-    convertToCSV(dataMap) {
-        if (dataMap.size === 0) return '';
-        
-        // CSV headers
-        const headers = ['Username', 'Display Name', 'Profile URL', 'Profile Picture URL', 'Collected At'];
-        let csvContent = headers.join(',') + '\n';
-        
-        // Add data rows
-        for (const [username, userData] of dataMap) {
-            const row = [
-                `"${userData.username || ''}"`,
-                `"${userData.displayName || ''}"`,
-                `"${userData.profileUrl || ''}"`,
-                `"${userData.profilePicUrl || ''}"`,
-                `"${userData.timestamp || ''}"`
-            ];
-            csvContent += row.join(',') + '\n';
+    extractProfileNameFromURL() {
+        try {
+            const currentUrl = window.location.href;
+            if (currentUrl.includes('instagram.com')) {
+                const urlObj = new URL(currentUrl);
+                const path = urlObj.pathname.replace(/^\/+|\/+$/g, '');
+                const pathParts = path.split('/');
+                if (pathParts.length > 0 && pathParts[0] !== '') {
+                    return pathParts[0];
+                }
+            }
+        } catch (error) {
+            return 'Nome.Profilo';
         }
-        
-        return csvContent;
+        return 'Nome.Profilo';
     }
 }
 
@@ -449,9 +496,9 @@ class InstagramAnalyzer {
 if (window.location.hostname === 'www.instagram.com') {
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => {
-            new InstagramAnalyzer();
+            new InstagramFollowersSelector();
         });
     } else {
-        new InstagramAnalyzer();
+        new InstagramFollowersSelector();
     }
 }
