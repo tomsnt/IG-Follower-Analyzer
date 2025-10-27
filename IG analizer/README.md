@@ -132,11 +132,45 @@ Puoi usare questi file per testare l'app prima di caricare i tuoi dati reali.
 - File molto grandi potrebbero richiedere qualche secondo per essere processati
 - L'app mostrerà un indicatore di caricamento durante l'elaborazione
 
-## Requisiti
+## 📦 Distribuzione e Installazione
 
+### Per Sviluppatori
 - macOS 12.0+ o iOS 15.0+
 - Xcode 14.0+ per compilare dall'origine
 - File HTML esportati da Instagram
+
+### Per Utenti Finali
+
+#### 🎯 **Opzione 1: TestFlight** (Raccomandata)
+L'app è disponibile in beta su TestFlight per facilità di installazione:
+
+1. **Ottieni il link TestFlight** dal sviluppatore
+2. **Apri il link** sul tuo iPhone/iPad/Mac
+3. **Installa TestFlight** (se non già presente)
+4. **Installa Instagram Analyzer** con un click
+5. **Ricevi aggiornamenti automatici**
+
+#### 🌐 **Opzione 2: Versione Web** (Coming Soon)
+Una versione web dell'app sarà disponibile per tutti i sistemi operativi:
+- Funziona su iPhone, Android, Windows, Mac, Linux
+- Nessuna installazione necessaria
+- Stesse funzionalità dell'app nativa
+
+#### 🔧 **Opzione 3: Build Manuale**
+Per utenti tecnici che vogliono compilare dall'origine:
+```bash
+git clone https://github.com/tuousername/IG-Follower-Analyzer.git
+cd "IG-Follower-Analyzer"
+open "IG analizer.xcodeproj"
+# Build in Xcode
+```
+
+### 📤 Condivisione con Amici
+Vuoi condividere l'app con i tuoi amici? Leggi la [Guida alla Distribuzione](DISTRIBUTION_GUIDE.md) per:
+- Setup TestFlight per beta testing
+- Pubblicazione su App Store
+- Creazione di una versione web cross-platform
+- Distribuzione diretta via GitHub Releases
 
 ## Note sulla Privacy
 
