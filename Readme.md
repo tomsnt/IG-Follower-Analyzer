@@ -47,7 +47,6 @@ Any modern web browser (Chrome, Firefox, Safari, Edge)
 - Google Chrome for the data export
 
 ## Requirements
-- macOS for the desktop app (Xcode required to run)
 - Google Chrome for the plugin
 
 ---
