@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -362,11 +362,11 @@
             <h1>📊 Instagram Analyzer</h1>
             
             <div class="mode-switcher">
-                <button class="mode-btn active" data-mode="analyze">Analisi</button>
-                <button class="mode-btn" data-mode="compare">Confronto</button>
+                <button class="mode-btn active" data-mode="analyze">Analysis</button>
+                <button class="mode-btn" data-mode="compare">Compare</button>
             </div>
             
-            <button class="header-btn" onclick="showHistory()">📜 Storico</button>
+            <button class="header-btn" onclick="showHistory()">📜 History</button>
         </header>
         
         <div class="main">
@@ -374,12 +374,12 @@
             <aside class="sidebar">
                 <!-- Analyze Mode Controls -->
                 <div id="analyze-controls">
-                    <h2 style="margin-bottom: 16px;">Carica i File</h2>
+                    <h2 style="margin-bottom: 16px;">Upload Files</h2>
                     
                     <div class="drop-zone" id="followers-drop">
                         <div class="icon">👥</div>
-                        <h3>Follower</h3>
-                        <p>Trascina il file CSV o HTML</p>
+                        <h3>Followers</h3>
+                        <p>Drag CSV or HTML file here</p>
                         <input type="file" accept=".csv,.html,.htm" id="followers-input">
                     </div>
                     <div id="followers-status"></div>
@@ -387,38 +387,38 @@
                     <div class="drop-zone" id="following-drop">
                         <div class="icon">➕</div>
                         <h3>Following</h3>
-                        <p>Trascina il file CSV o HTML</p>
+                        <p>Drag CSV or HTML file here</p>
                         <input type="file" accept=".csv,.html,.htm" id="following-input">
                     </div>
                     <div id="following-status"></div>
                     
                     <button class="action-btn" id="analyze-btn" disabled onclick="analyzeFollowers()">
-                        📊 Avvia Analisi
+                        📊 Run Analysis
                     </button>
                 </div>
                 
                 <!-- Compare Mode Controls -->
                 <div id="compare-controls" class="hidden">
-                    <h2 style="margin-bottom: 16px;">Confronta Follower</h2>
+                    <h2 style="margin-bottom: 16px;">Compare Followers</h2>
                     
                     <div class="drop-zone" id="old-followers-drop">
                         <div class="icon">🕐</div>
-                        <h3>Follower Vecchi</h3>
-                        <p>File precedente dei follower</p>
+                        <h3>Old Followers</h3>
+                        <p>Previous followers file</p>
                         <input type="file" accept=".csv,.html,.htm" id="old-followers-input">
                     </div>
                     <div id="old-followers-status"></div>
                     
                     <div class="drop-zone" id="new-followers-drop">
                         <div class="icon">⬆️</div>
-                        <h3>Follower Nuovi</h3>
-                        <p>File aggiornato dei follower</p>
+                        <h3>New Followers</h3>
+                        <p>Updated followers file</p>
                         <input type="file" accept=".csv,.html,.htm" id="new-followers-input">
                     </div>
                     <div id="new-followers-status"></div>
                     
                     <button class="action-btn" id="compare-btn" disabled onclick="compareFollowers()">
-                        🔄 Confronta
+                        🔄 Compare
                     </button>
                 </div>
             </aside>
@@ -432,13 +432,13 @@
                 
                 <!-- Analyze Results -->
                 <div id="analyze-results" class="hidden">
-                    <h2 style="margin-bottom: 16px;">Risultati Analisi</h2>
+                    <h2 style="margin-bottom: 16px;">Analysis Results</h2>
                     
                     <div class="stats-grid">
                         <div class="stat-card pink">
                             <div class="icon">🚫</div>
                             <div class="count" id="not-following-back-count">0</div>
-                            <div class="label">Non ti seguono</div>
+                            <div class="label">Not Following Back</div>
                         </div>
                         <div class="stat-card yellow">
                             <div class="icon">🤝</div>
@@ -448,7 +448,7 @@
                         <div class="stat-card purple">
                             <div class="icon">➕</div>
                             <div class="count" id="not-following-count">0</div>
-                            <div class="label">Non segui</div>
+                            <div class="label">You Don't Follow</div>
                         </div>
                     </div>
                     
@@ -457,20 +457,20 @@
                 
                 <!-- Compare Results -->
                 <div id="compare-results" class="hidden">
-                    <h2 style="margin-bottom: 16px;">Risultati Confronto</h2>
+                    <h2 style="margin-bottom: 16px;">Comparison Results</h2>
                     
                     <div class="comparison-summary">
                         <div class="comparison-item positive">
                             <div class="value" id="new-followers-count">0</div>
-                            <div class="label">Nuovi follower</div>
+                            <div class="label">New Followers</div>
                         </div>
                         <div class="comparison-item negative">
                             <div class="value" id="lost-followers-count">0</div>
-                            <div class="label">Follower persi</div>
+                            <div class="label">Lost Followers</div>
                         </div>
                         <div class="comparison-item" id="net-change-item">
                             <div class="value" id="net-change">0</div>
-                            <div class="label">Variazione netta</div>
+                            <div class="label">Net Change</div>
                         </div>
                     </div>
                     
@@ -484,12 +484,12 @@
     <div class="modal" id="history-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>📜 Storico Analisi</h2>
+                <h2>📜 Analysis History</h2>
                 <button class="modal-close" onclick="closeHistory()">×</button>
             </div>
             <div id="history-list"></div>
             <button class="action-btn" style="background: #ef4444; margin-top: 16px;" onclick="clearHistory()">
-                🗑️ Cancella Storico
+                🗑️ Clear History
             </button>
         </div>
     </div>
@@ -704,16 +704,16 @@
         function updateStatus() {
             // Analyze mode
             document.getElementById('followers-status').innerHTML = 
-                followers.length ? `<span class="status-badge">✓ ${followers.length} follower caricati</span>` : '';
+                followers.length ? `<span class="status-badge">✓ ${followers.length} followers loaded</span>` : '';
             document.getElementById('following-status').innerHTML = 
-                following.length ? `<span class="status-badge">✓ ${following.length} following caricati</span>` : '';
+                following.length ? `<span class="status-badge">✓ ${following.length} following loaded</span>` : '';
             document.getElementById('analyze-btn').disabled = !(followers.length && following.length);
             
             // Compare mode
             document.getElementById('old-followers-status').innerHTML = 
-                oldFollowers.length ? `<span class="status-badge blue">✓ ${oldFollowers.length} follower vecchi</span>` : '';
+                oldFollowers.length ? `<span class="status-badge blue">✓ ${oldFollowers.length} old followers</span>` : '';
             document.getElementById('new-followers-status').innerHTML = 
-                newFollowers.length ? `<span class="status-badge">✓ ${newFollowers.length} follower nuovi</span>` : '';
+                newFollowers.length ? `<span class="status-badge">✓ ${newFollowers.length} new followers</span>` : '';
             document.getElementById('compare-btn').disabled = !(oldFollowers.length && newFollowers.length);
         }
         
@@ -733,9 +733,9 @@
             
             // Render lists
             document.getElementById('user-lists').innerHTML = `
-                ${renderUserList('Non ti seguono', notFollowingBack, 'pink')}
+                ${renderUserList('Not Following Back', notFollowingBack, 'pink')}
                 ${renderUserList('Mutual', mutual, 'yellow')}
-                ${renderUserList('Non segui', notFollowing, 'purple')}
+                ${renderUserList("You Don't Follow", notFollowing, 'purple')}
             `;
             
             document.getElementById('analyze-results').classList.remove('hidden');
@@ -770,8 +770,8 @@
             netItem.classList.add(netChange >= 0 ? 'positive' : 'negative');
             
             document.getElementById('compare-user-lists').innerHTML = `
-                ${renderUserList('Nuovi Follower', gained, 'green')}
-                ${renderUserList('Follower Persi', lost, 'red')}
+                ${renderUserList('New Followers', gained, 'green')}
+                ${renderUserList('Lost Followers', lost, 'red')}
             `;
             
             document.getElementById('compare-results').classList.remove('hidden');
@@ -793,7 +793,7 @@
                                 <div class="user-info">
                                     <div class="username">@${u.username}</div>
                                 </div>
-                                <a class="user-link" href="${u.profileURL}" target="_blank">Apri ↗</a>
+                                <a class="user-link" href="${u.profileURL}" target="_blank">Open ↗</a>
                             </div>
                         `).join('')}
                     </div>
@@ -814,11 +814,11 @@
             const list = document.getElementById('history-list');
             
             if (!history.snapshots.length) {
-                list.innerHTML = '<p style="color: rgba(255,255,255,0.6);">Nessun dato storico disponibile.</p>';
+                list.innerHTML = '<p style="color: rgba(255,255,255,0.6);">No history data available.</p>';
             } else {
                 list.innerHTML = history.snapshots.map(s => `
                     <div class="history-item">
-                        <div class="date">${new Date(s.date).toLocaleDateString('it-IT', { 
+                        <div class="date">${new Date(s.date).toLocaleDateString('en-US', { 
                             year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
                         })}</div>
                         <div class="history-stats">
@@ -838,7 +838,7 @@
         }
         
         function clearHistory() {
-            if (confirm('Sei sicuro di voler cancellare tutto lo storico?')) {
+            if (confirm('Are you sure you want to clear all history?')) {
                 history = { snapshots: [] };
                 localStorage.removeItem('igAnalyzerHistory');
                 closeHistory();
@@ -861,7 +861,7 @@
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: data.map(d => d.date.toLocaleDateString('it-IT', { month: 'short', day: 'numeric' })),
+                    labels: data.map(d => d.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })),
                     datasets: [
                         {
                             label: 'Followers',

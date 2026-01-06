@@ -19,15 +19,16 @@ This project helps you analyze your Instagram followers and following lists usin
 3. Choose whether to collect followers or following.
 4. Follow the popup instructions:
    - Press the button to start collecting.
-   - Manually scroll the list to the bottom (the plugin only reads what is visible as you scroll).
+   - Use the **Auto-Scroll** feature to automatically scroll through the list, or scroll manually.
+   - The plugin collects usernames as they become visible.
    - When finished, press the download button to export the data as CSV.
 
 ### 3. Analyze Data with the Web App
 
 1. Open `web-version/index.html` in your browser (or run a local server).
 2. Choose between:
-   - **Analisi**: Upload followers and following CSV/HTML files to see who doesn't follow you back and mutual connections.
-   - **Confronto**: Compare old and new follower lists to see who gained/lost followers.
+   - **Analysis**: Upload followers and following CSV/HTML files to see who doesn't follow you back and mutual connections.
+   - **Compare**: Compare old and new follower lists to see who you've gained/lost.
 3. Drag and drop CSV files exported from the plugin into the web app.
 4. View analysis results with charts and detailed user lists.
 
