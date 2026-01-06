@@ -1,0 +1,907 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instagram Analyzer</title>
+    <link rel="manifest" href="manifest.json">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --pink: #EB3FCE;
+            --purple: #8B5CF6;
+            --yellow: #F5CC0C;
+            --gradient: linear-gradient(90deg, #EB3FCE, #8B5CF6);
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1a1a2e;
+            min-height: 100vh;
+            color: #fff;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(255,255,255,0.05);
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .header h1 {
+            font-size: 1.4rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .mode-switcher {
+            display: flex;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-left: auto;
+        }
+        
+        .mode-btn {
+            padding: 8px 20px;
+            border: none;
+            background: transparent;
+            color: #fff;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .mode-btn.active {
+            background: var(--gradient);
+        }
+        
+        .header-btn {
+            padding: 8px 16px;
+            border: 1px solid var(--purple);
+            background: transparent;
+            color: var(--purple);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .header-btn:hover {
+            background: var(--purple);
+            color: #fff;
+        }
+        
+        /* Main Layout */
+        .main {
+            display: flex;
+            flex: 1;
+        }
+        
+        .sidebar {
+            width: 380px;
+            padding: 24px;
+            border-right: 1px solid rgba(255,255,255,0.1);
+            overflow-y: auto;
+        }
+        
+        .content {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+        }
+        
+        /* Drop Zones */
+        .drop-zone {
+            border: 2px dashed rgba(255,255,255,0.3);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-bottom: 16px;
+            transition: 0.3s;
+            cursor: pointer;
+            background: rgba(255,255,255,0.02);
+        }
+        
+        .drop-zone:hover, .drop-zone.dragover {
+            border-color: var(--pink);
+            background: rgba(235,63,206,0.1);
+        }
+        
+        .drop-zone .icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+        
+        .drop-zone h3 { margin-bottom: 4px; }
+        .drop-zone p { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+        .drop-zone input { display: none; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 6px 12px;
+            background: rgba(34,197,94,0.2);
+            color: #22c55e;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            margin-top: 8px;
+        }
+        
+        .status-badge.blue {
+            background: rgba(59,130,246,0.2);
+            color: #3b82f6;
+        }
+        
+        /* Action Button */
+        .action-btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 10px;
+            background: var(--gradient);
+            color: #fff;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 16px;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .action-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .action-btn:not(:disabled):hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(235,63,206,0.3);
+        }
+        
+        /* Chart */
+        .chart-container {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 24px;
+            height: 300px;
+        }
+        
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .stat-card .icon { font-size: 1.5rem; margin-bottom: 8px; }
+        .stat-card .count { font-size: 2rem; font-weight: 700; }
+        .stat-card .label { color: rgba(255,255,255,0.6); font-size: 0.9rem; }
+        
+        .stat-card.pink { border-left: 4px solid var(--pink); }
+        .stat-card.pink .count, .stat-card.pink .icon { color: var(--pink); }
+        
+        .stat-card.yellow { border-left: 4px solid var(--yellow); }
+        .stat-card.yellow .count, .stat-card.yellow .icon { color: var(--yellow); }
+        
+        .stat-card.purple { border-left: 4px solid var(--purple); }
+        .stat-card.purple .count, .stat-card.purple .icon { color: var(--purple); }
+        
+        .stat-card.green { border-left: 4px solid #22c55e; }
+        .stat-card.green .count, .stat-card.green .icon { color: #22c55e; }
+        
+        .stat-card.red { border-left: 4px solid #ef4444; }
+        .stat-card.red .count, .stat-card.red .icon { color: #ef4444; }
+        
+        /* User Lists */
+        .user-list-section {
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .user-list-header {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .user-list-header h3 { font-size: 1rem; }
+        .user-list-header .count { 
+            background: var(--gradient);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+        }
+        
+        .user-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .user-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            gap: 12px;
+        }
+        
+        .user-item:hover { background: rgba(255,255,255,0.05); }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .user-info { flex: 1; }
+        .user-info .username { font-weight: 500; }
+        
+        .user-link {
+            color: var(--pink);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+        
+        /* Comparison Results */
+        .comparison-summary {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            padding: 24px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 24px;
+        }
+        
+        .comparison-item { text-align: center; }
+        .comparison-item .value { font-size: 2.5rem; font-weight: 700; }
+        .comparison-item .label { color: rgba(255,255,255,0.6); }
+        .comparison-item.positive .value { color: #22c55e; }
+        .comparison-item.negative .value { color: #ef4444; }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.8);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .history-item {
+            padding: 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .history-item .date { font-weight: 600; margin-bottom: 8px; }
+        .history-stats { display: flex; gap: 16px; font-size: 0.9rem; color: rgba(255,255,255,0.7); }
+        
+        .hidden { display: none !important; }
+        
+        /* Responsive */
+        @media (max-width: 900px) {
+            .main { flex-direction: column; }
+            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <h1>📊 Instagram Analyzer</h1>
+            
+            <div class="mode-switcher">
+                <button class="mode-btn active" data-mode="analyze">Analisi</button>
+                <button class="mode-btn" data-mode="compare">Confronto</button>
+            </div>
+            
+            <button class="header-btn" onclick="showHistory()">📜 Storico</button>
+        </header>
+        
+        <div class="main">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <!-- Analyze Mode Controls -->
+                <div id="analyze-controls">
+                    <h2 style="margin-bottom: 16px;">Carica i File</h2>
+                    
+                    <div class="drop-zone" id="followers-drop">
+                        <div class="icon">👥</div>
+                        <h3>Follower</h3>
+                        <p>Trascina il file CSV o HTML</p>
+                        <input type="file" accept=".csv,.html,.htm" id="followers-input">
+                    </div>
+                    <div id="followers-status"></div>
+                    
+                    <div class="drop-zone" id="following-drop">
+                        <div class="icon">➕</div>
+                        <h3>Following</h3>
+                        <p>Trascina il file CSV o HTML</p>
+                        <input type="file" accept=".csv,.html,.htm" id="following-input">
+                    </div>
+                    <div id="following-status"></div>
+                    
+                    <button class="action-btn" id="analyze-btn" disabled onclick="analyzeFollowers()">
+                        📊 Avvia Analisi
+                    </button>
+                </div>
+                
+                <!-- Compare Mode Controls -->
+                <div id="compare-controls" class="hidden">
+                    <h2 style="margin-bottom: 16px;">Confronta Follower</h2>
+                    
+                    <div class="drop-zone" id="old-followers-drop">
+                        <div class="icon">🕐</div>
+                        <h3>Follower Vecchi</h3>
+                        <p>File precedente dei follower</p>
+                        <input type="file" accept=".csv,.html,.htm" id="old-followers-input">
+                    </div>
+                    <div id="old-followers-status"></div>
+                    
+                    <div class="drop-zone" id="new-followers-drop">
+                        <div class="icon">⬆️</div>
+                        <h3>Follower Nuovi</h3>
+                        <p>File aggiornato dei follower</p>
+                        <input type="file" accept=".csv,.html,.htm" id="new-followers-input">
+                    </div>
+                    <div id="new-followers-status"></div>
+                    
+                    <button class="action-btn" id="compare-btn" disabled onclick="compareFollowers()">
+                        🔄 Confronta
+                    </button>
+                </div>
+            </aside>
+            
+            <!-- Content -->
+            <main class="content">
+                <!-- Chart -->
+                <div class="chart-container">
+                    <canvas id="historyChart"></canvas>
+                </div>
+                
+                <!-- Analyze Results -->
+                <div id="analyze-results" class="hidden">
+                    <h2 style="margin-bottom: 16px;">Risultati Analisi</h2>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card pink">
+                            <div class="icon">🚫</div>
+                            <div class="count" id="not-following-back-count">0</div>
+                            <div class="label">Non ti seguono</div>
+                        </div>
+                        <div class="stat-card yellow">
+                            <div class="icon">🤝</div>
+                            <div class="count" id="mutual-count">0</div>
+                            <div class="label">Mutual</div>
+                        </div>
+                        <div class="stat-card purple">
+                            <div class="icon">➕</div>
+                            <div class="count" id="not-following-count">0</div>
+                            <div class="label">Non segui</div>
+                        </div>
+                    </div>
+                    
+                    <div id="user-lists"></div>
+                </div>
+                
+                <!-- Compare Results -->
+                <div id="compare-results" class="hidden">
+                    <h2 style="margin-bottom: 16px;">Risultati Confronto</h2>
+                    
+                    <div class="comparison-summary">
+                        <div class="comparison-item positive">
+                            <div class="value" id="new-followers-count">0</div>
+                            <div class="label">Nuovi follower</div>
+                        </div>
+                        <div class="comparison-item negative">
+                            <div class="value" id="lost-followers-count">0</div>
+                            <div class="label">Follower persi</div>
+                        </div>
+                        <div class="comparison-item" id="net-change-item">
+                            <div class="value" id="net-change">0</div>
+                            <div class="label">Variazione netta</div>
+                        </div>
+                    </div>
+                    
+                    <div id="compare-user-lists"></div>
+                </div>
+            </main>
+        </div>
+    </div>
+    
+    <!-- History Modal -->
+    <div class="modal" id="history-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📜 Storico Analisi</h2>
+                <button class="modal-close" onclick="closeHistory()">×</button>
+            </div>
+            <div id="history-list"></div>
+            <button class="action-btn" style="background: #ef4444; margin-top: 16px;" onclick="clearHistory()">
+                🗑️ Cancella Storico
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let followers = [];
+        let following = [];
+        let oldFollowers = [];
+        let newFollowers = [];
+        let history = JSON.parse(localStorage.getItem('igAnalyzerHistory') || '{"snapshots":[]}');
+        let currentMode = 'analyze';
+        let chart = null;
+        
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            initDropZones();
+            initModeSwitcher();
+            renderChart();
+        });
+        
+        // Mode Switcher
+        function initModeSwitcher() {
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentMode = btn.dataset.mode;
+                    
+                    document.getElementById('analyze-controls').classList.toggle('hidden', currentMode !== 'analyze');
+                    document.getElementById('compare-controls').classList.toggle('hidden', currentMode !== 'compare');
+                    document.getElementById('analyze-results').classList.add('hidden');
+                    document.getElementById('compare-results').classList.add('hidden');
+                    
+                    // Reset
+                    followers = []; following = []; oldFollowers = []; newFollowers = [];
+                    updateStatus();
+                });
+            });
+        }
+        
+        // Drop Zones
+        function initDropZones() {
+            setupDropZone('followers-drop', 'followers-input', (users) => {
+                followers = users;
+                updateStatus();
+            });
+            setupDropZone('following-drop', 'following-input', (users) => {
+                following = users;
+                updateStatus();
+            });
+            setupDropZone('old-followers-drop', 'old-followers-input', (users) => {
+                oldFollowers = users;
+                updateStatus();
+            });
+            setupDropZone('new-followers-drop', 'new-followers-input', (users) => {
+                newFollowers = users;
+                updateStatus();
+            });
+        }
+        
+        function setupDropZone(dropId, inputId, callback) {
+            const drop = document.getElementById(dropId);
+            const input = document.getElementById(inputId);
+            
+            drop.addEventListener('click', () => input.click());
+            
+            drop.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                drop.classList.add('dragover');
+            });
+            
+            drop.addEventListener('dragleave', () => drop.classList.remove('dragover'));
+            
+            drop.addEventListener('drop', (e) => {
+                e.preventDefault();
+                drop.classList.remove('dragover');
+                if (e.dataTransfer.files.length) {
+                    processFile(e.dataTransfer.files[0], callback);
+                }
+            });
+            
+            input.addEventListener('change', () => {
+                if (input.files.length) {
+                    processFile(input.files[0], callback);
+                }
+            });
+        }
+        
+        function processFile(file, callback) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target.result;
+                const users = parseFile(content);
+                callback(users);
+            };
+            reader.readAsText(file);
+        }
+        
+        // Parsing
+        function parseFile(content) {
+            if (content.includes('Username,Display Name,Profile URL')) {
+                return parseCSV(content);
+            } else {
+                return parseHTML(content);
+            }
+        }
+        
+        function parseCSV(content) {
+            const users = [];
+            const lines = parseCSVRecords(content);
+            
+            for (let i = 1; i < lines.length; i++) {
+                const fields = lines[i];
+                if (fields.length >= 3) {
+                    const username = fields[0].trim();
+                    const profileURL = fields[2].trim();
+                    
+                    if (username && isValidUsername(username) && !users.find(u => u.username === username)) {
+                        users.push({
+                            username,
+                            profileURL: profileURL || `https://www.instagram.com/${username}`,
+                            timestamp: fields[4] ? new Date(fields[4]) : new Date()
+                        });
+                    }
+                }
+            }
+            return users;
+        }
+        
+        function parseCSVRecords(content) {
+            const records = [];
+            let currentRecord = [];
+            let currentField = '';
+            let insideQuotes = false;
+            
+            for (let i = 0; i < content.length; i++) {
+                const char = content[i];
+                
+                if (char === '"') {
+                    if (content[i + 1] === '"') {
+                        currentField += '"';
+                        i++;
+                    } else {
+                        insideQuotes = !insideQuotes;
+                    }
+                } else if (char === ',' && !insideQuotes) {
+                    currentRecord.push(currentField);
+                    currentField = '';
+                } else if ((char === '\n' || char === '\r') && !insideQuotes) {
+                    currentRecord.push(currentField);
+                    if (currentRecord.length > 0) records.push(currentRecord);
+                    currentRecord = [];
+                    currentField = '';
+                    if (char === '\r' && content[i + 1] === '\n') i++;
+                } else {
+                    currentField += char;
+                }
+            }
+            
+            currentRecord.push(currentField);
+            if (currentRecord.some(f => f)) records.push(currentRecord);
+            
+            return records;
+        }
+        
+        function parseHTML(content) {
+            const users = [];
+            
+            // Pattern for followers
+            const linkRegex = /<a\s+target="_blank"\s+href="https:\/\/www\.instagram\.com\/([^"]+)">([^<]+)<\/a>/g;
+            let match;
+            while ((match = linkRegex.exec(content)) !== null) {
+                const username = match[2].trim();
+                if (isValidUsername(username) && !users.find(u => u.username === username)) {
+                    users.push({
+                        username,
+                        profileURL: `https://www.instagram.com/${username}`,
+                        timestamp: new Date()
+                    });
+                }
+            }
+            
+            // Pattern for following
+            const h2Regex = /<h2\s+class="_3-95\s+_2pim\s+_a6-h\s+_a6-i">([^<]+)<\/h2>/g;
+            while ((match = h2Regex.exec(content)) !== null) {
+                const username = match[1].trim();
+                if (isValidUsername(username) && !users.find(u => u.username === username)) {
+                    users.push({
+                        username,
+                        profileURL: `https://www.instagram.com/${username}`,
+                        timestamp: new Date()
+                    });
+                }
+            }
+            
+            return users;
+        }
+        
+        function isValidUsername(text) {
+            const trimmed = text.trim();
+            if (!trimmed || trimmed.length > 30 || trimmed.includes(' ')) return false;
+            
+            const excluded = ['username', 'display name', 'profile url', 'collected at'];
+            if (excluded.includes(trimmed.toLowerCase())) return false;
+            
+            if (trimmed.includes('http') || trimmed.includes('.com') || trimmed.includes('.html')) return false;
+            
+            return /^[a-zA-Z0-9._]+$/.test(trimmed) && !trimmed.startsWith('.') && !trimmed.endsWith('.');
+        }
+        
+        function updateStatus() {
+            // Analyze mode
+            document.getElementById('followers-status').innerHTML = 
+                followers.length ? `<span class="status-badge">✓ ${followers.length} follower caricati</span>` : '';
+            document.getElementById('following-status').innerHTML = 
+                following.length ? `<span class="status-badge">✓ ${following.length} following caricati</span>` : '';
+            document.getElementById('analyze-btn').disabled = !(followers.length && following.length);
+            
+            // Compare mode
+            document.getElementById('old-followers-status').innerHTML = 
+                oldFollowers.length ? `<span class="status-badge blue">✓ ${oldFollowers.length} follower vecchi</span>` : '';
+            document.getElementById('new-followers-status').innerHTML = 
+                newFollowers.length ? `<span class="status-badge">✓ ${newFollowers.length} follower nuovi</span>` : '';
+            document.getElementById('compare-btn').disabled = !(oldFollowers.length && newFollowers.length);
+        }
+        
+        // Analysis
+        function analyzeFollowers() {
+            const followersSet = new Set(followers.map(u => u.username));
+            const followingSet = new Set(following.map(u => u.username));
+            
+            const notFollowingBack = following.filter(u => !followersSet.has(u.username));
+            const notFollowing = followers.filter(u => !followingSet.has(u.username));
+            const mutual = followers.filter(u => followingSet.has(u.username));
+            
+            // Update UI
+            document.getElementById('not-following-back-count').textContent = notFollowingBack.length;
+            document.getElementById('mutual-count').textContent = mutual.length;
+            document.getElementById('not-following-count').textContent = notFollowing.length;
+            
+            // Render lists
+            document.getElementById('user-lists').innerHTML = `
+                ${renderUserList('Non ti seguono', notFollowingBack, 'pink')}
+                ${renderUserList('Mutual', mutual, 'yellow')}
+                ${renderUserList('Non segui', notFollowing, 'purple')}
+            `;
+            
+            document.getElementById('analyze-results').classList.remove('hidden');
+            
+            // Save to history
+            saveSnapshot({
+                date: new Date().toISOString(),
+                followersCount: followers.length,
+                followingCount: following.length,
+                mutualCount: mutual.length,
+                notFollowingBackCount: notFollowingBack.length,
+                notFollowingCount: notFollowing.length
+            });
+            
+            renderChart();
+        }
+        
+        function compareFollowers() {
+            const oldSet = new Set(oldFollowers.map(u => u.username));
+            const newSet = new Set(newFollowers.map(u => u.username));
+            
+            const gained = newFollowers.filter(u => !oldSet.has(u.username));
+            const lost = oldFollowers.filter(u => !newSet.has(u.username));
+            const netChange = gained.length - lost.length;
+            
+            document.getElementById('new-followers-count').textContent = gained.length;
+            document.getElementById('lost-followers-count').textContent = lost.length;
+            document.getElementById('net-change').textContent = (netChange >= 0 ? '+' : '') + netChange;
+            
+            const netItem = document.getElementById('net-change-item');
+            netItem.classList.remove('positive', 'negative');
+            netItem.classList.add(netChange >= 0 ? 'positive' : 'negative');
+            
+            document.getElementById('compare-user-lists').innerHTML = `
+                ${renderUserList('Nuovi Follower', gained, 'green')}
+                ${renderUserList('Follower Persi', lost, 'red')}
+            `;
+            
+            document.getElementById('compare-results').classList.remove('hidden');
+        }
+        
+        function renderUserList(title, users, color) {
+            if (!users.length) return '';
+            
+            return `
+                <div class="user-list-section">
+                    <div class="user-list-header" onclick="this.nextElementSibling.classList.toggle('hidden')">
+                        <h3>${title}</h3>
+                        <span class="count">${users.length}</span>
+                    </div>
+                    <div class="user-list">
+                        ${users.map(u => `
+                            <div class="user-item">
+                                <div class="user-avatar">${u.username[0].toUpperCase()}</div>
+                                <div class="user-info">
+                                    <div class="username">@${u.username}</div>
+                                </div>
+                                <a class="user-link" href="${u.profileURL}" target="_blank">Apri ↗</a>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+        
+        // History
+        function saveSnapshot(snapshot) {
+            history.snapshots.push(snapshot);
+            if (history.snapshots.length > 30) {
+                history.snapshots = history.snapshots.slice(-30);
+            }
+            localStorage.setItem('igAnalyzerHistory', JSON.stringify(history));
+        }
+        
+        function showHistory() {
+            const list = document.getElementById('history-list');
+            
+            if (!history.snapshots.length) {
+                list.innerHTML = '<p style="color: rgba(255,255,255,0.6);">Nessun dato storico disponibile.</p>';
+            } else {
+                list.innerHTML = history.snapshots.map(s => `
+                    <div class="history-item">
+                        <div class="date">${new Date(s.date).toLocaleDateString('it-IT', { 
+                            year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' 
+                        })}</div>
+                        <div class="history-stats">
+                            <span>👥 ${s.followersCount} followers</span>
+                            <span>➕ ${s.followingCount} following</span>
+                            <span>🤝 ${s.mutualCount} mutual</span>
+                        </div>
+                    </div>
+                `).reverse().join('');
+            }
+            
+            document.getElementById('history-modal').classList.add('active');
+        }
+        
+        function closeHistory() {
+            document.getElementById('history-modal').classList.remove('active');
+        }
+        
+        function clearHistory() {
+            if (confirm('Sei sicuro di voler cancellare tutto lo storico?')) {
+                history = { snapshots: [] };
+                localStorage.removeItem('igAnalyzerHistory');
+                closeHistory();
+                renderChart();
+            }
+        }
+        
+        // Chart
+        function renderChart() {
+            const ctx = document.getElementById('historyChart').getContext('2d');
+            
+            if (chart) chart.destroy();
+            
+            const data = history.snapshots.map(s => ({
+                date: new Date(s.date),
+                followers: s.followersCount,
+                following: s.followingCount
+            }));
+            
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => d.date.toLocaleDateString('it-IT', { month: 'short', day: 'numeric' })),
+                    datasets: [
+                        {
+                            label: 'Followers',
+                            data: data.map(d => d.followers),
+                            borderColor: '#EB3FCE',
+                            backgroundColor: 'rgba(235, 63, 206, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Following',
+                            data: data.map(d => d.following),
+                            borderColor: '#8B5CF6',
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#fff' }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.6)' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255,255,255,0.1)' },
+                            ticks: { color: 'rgba(255,255,255,0.6)' }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
