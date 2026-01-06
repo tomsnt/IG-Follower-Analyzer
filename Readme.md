@@ -1,6 +1,6 @@
 # IG Follower Analyzer
 
-This project helps you analyze your Instagram followers and following lists using a simple desktop app (macOS, Xcode only) and a Chrome plugin. It is not a complete or fully automated solution: you need to manually select what to analyze and scroll the lists yourself. The tool is designed for personal use, is semi-automatic, and does not require any Instagram login or credentials.
+This project helps you analyze your Instagram followers and following lists using a web-based app and a Chrome plugin. It is not a complete or fully automated solution: you need to manually select what to analyze and scroll the lists yourself. The tool is designed for personal use, is semi-automatic, and does not require any Instagram login or credentials.
 
 ---
 
@@ -10,7 +10,7 @@ This project helps you analyze your Instagram followers and following lists usin
 
 1. Open Chrome and go to `chrome://extensions/`.
 2. Enable Developer Mode (top right).
-3. Click "Load unpacked" and select the folder `IG analizer/IGa_Plugin/Plugin_chrome`.
+3. Click "Load unpacked" and select the folder `chrome-extension`.
 
 ### 2. Collect Data from Instagram
 
@@ -22,24 +22,28 @@ This project helps you analyze your Instagram followers and following lists usin
    - Manually scroll the list to the bottom (the plugin only reads what is visible as you scroll).
    - When finished, press the download button to export the data as CSV.
 
-### 3. Analyze Data with the App
+### 3. Analyze Data with the Web App
 
-1. Open the IG Follower Analyzer app on macOS via Xcode.
-2. Drag and drop the CSV files exported from the plugin into the app.
-3. You can view basic analysis and comparisons, such as who doesn't follow you back or who you have unfollowed. Features are limited and the process is not fully automatic.
+1. Open `web-version/index.html` in your browser (or run a local server).
+2. Choose between:
+   - **Analisi**: Upload followers and following CSV/HTML files to see who doesn't follow you back and mutual connections.
+   - **Confronto**: Compare old and new follower lists to see who gained/lost followers.
+3. Drag and drop CSV files exported from the plugin into the web app.
+4. View analysis results with charts and detailed user lists.
 
----
-
-## Important Notes
-- The app currently only works if run from Xcode (no installer provided).
-- The process is semi-automatic: you must manually select and scroll the lists.
+---web app is fully client-side: no data is sent to any server.
+- The process is semi-automatic: you must manually select and scroll the Instagram lists to export data.
 - No Instagram credentials are ever requested or stored.
 - The tool only reads data visible on your screen, just like a human would.
 - No data is sent anywhere: everything stays on your computer.
 - There is no tracking, analytics, or personal data collection of any kind.
+- Analysis history is stored locally in your browser (localStorage)
+- The tool only reads data visible on your screen, just like a human would.
+- No data is sent anywhere: everything stays on your computer.
+- There is no tracking, analytics, or personal data collection of any kind.
 - Because it is not a fully automated scraper and does not bypass Instagram's normal interface, it should not violate Instagram's Terms of Service (use at your own risk).
-
----
+Any modern web browser (Chrome, Firefox, Safari, Edge)
+- Google Chrome for the data export
 
 ## Requirements
 - macOS for the desktop app (Xcode required to run)
