@@ -32,22 +32,23 @@ This project helps you analyze your Instagram followers and following lists usin
 3. Drag and drop CSV files exported from the plugin into the web app.
 4. View analysis results with charts and detailed user lists.
 
----web app is fully client-side: no data is sent to any server.
+---
+
+## Privacy & Security
+
+- The web app is fully client-side: no data is sent to any server.
 - The process is semi-automatic: you must manually select and scroll the Instagram lists to export data or use the autoscroll feature (selecting the following/followers popup as a target to scroll).
 - No Instagram credentials are ever requested or stored.
 - The tool only reads data visible on your screen, just like a human would.
 - No data is sent anywhere: everything stays on your computer.
 - There is no tracking, analytics, or personal data collection of any kind.
-- Analysis history is stored locally in your browser (localStorage)
-- The tool only reads data visible on your screen, just like a human would.
-- No data is sent anywhere: everything stays on your computer.
-- There is no tracking, analytics, or personal data collection of any kind.
+- Analysis history is stored locally in your browser (localStorage).
 - Because it is not a fully automated scraper and does not bypass Instagram's normal interface, it should not violate Instagram's Terms of Service (use at your own risk).
-Any modern web browser (Chrome, Firefox, Safari, Edge)
-- Google Chrome for the data export
 
 ## Requirements
+
 - Google Chrome for the plugin
+- Any modern web browser (Chrome, Firefox, Safari, Edge) for the web app
 
 ---
 
