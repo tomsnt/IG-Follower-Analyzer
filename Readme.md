@@ -37,7 +37,7 @@ This project helps you analyze your Instagram followers and following lists usin
 ## Privacy & Security
 
 - The web app is fully client-side: no data is sent to any server.
-- The process is semi-automatic: you must manually select and scroll the Instagram lists to export data or use the autoscroll feature (selecting the following/followers popup as a target to scroll).
+- The process is semi-automatic: you must manually select and scroll the Instagram lists or use the autoscroll feature (selecting the following/followers popup as a target to scroll).
 - No Instagram credentials are ever requested or stored.
 - The tool only reads data visible on your screen, just like a human would.
 - No data is sent anywhere: everything stays on your computer.
