@@ -91,16 +91,16 @@ class InstagramFollowersSelector {
         this.counterWidget = document.createElement('div');
         this.counterWidget.id = 'instagram-analyzer-widget';
         this.counterWidget.innerHTML = `
-            <div style="position: fixed; top: 24px; right: 24px; background: transparent; color: #fff; border-radius: 24px; box-shadow: 0 4px 24px rgba(0,0,0,0.18); z-index: 999999; padding: 0; min-width: 420px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; pointer-events: auto;">
+            <div style="position: fixed; top: 24px; right: 24px; background: transparent; color: #fff; border-radius: 24px; z-index: 999999; padding: 0; min-width: 420px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; pointer-events: auto;">
                 <div style="display: flex; gap: 32px; justify-content: center; padding: 24px 24px 24px 24px;">
-                    <div id="followers-panel" style="background: #5a5a5a; border-radius: 32px; width: 150px; max-width: 150px; max-height: 160px; padding: 0 0 0px 0; display: flex; flex-direction: column; align-items: center;">
+                    <div id="followers-panel" style="background: #000000;border-radius: 30px; border: 1px solid white; width: 150px; max-width: 150px; max-height: 160px; padding: 0px 0 7px 0px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 24px rgb(255 255 255 / 14%);">
                         <div style="color: #fff; font-size: 14px; font-weight: 500; padding: 12px 0 0 0; text-align: center; border-top-left-radius: 32px; border-top-right-radius: 32px;">Followers</div>
                         <div style="background: #ededed; border-radius: 24px; margin-top: 8px; width: 90%; display: flex; flex-direction: column; align-items: center; padding: 12px 0 0 0;">
                             <div id="followers-count" style="font-size: 14px; font-weight: 600; color: #111; margin-bottom: 8px;">0</div>
                             <div id="followers-actions" style="display: flex; gap: 8px; justify-content: center; align-items: center;"></div>
                         </div>
                     </div>
-                    <div id="following-panel" style="background: #5a5a5a; border-radius: 32px; width: 150px; max-width: 150px; max-height: 160px; padding: 0 0 0px 0; display: flex; flex-direction: column; align-items: center;">
+                    <div id="following-panel" style="background: #000000;border-radius: 30px; border: 1px solid white; width: 150px; max-width: 150px; max-height: 160px; padding: 0px 0 7px 0px; display: flex; flex-direction: column; align-items: center; box-shadow: 0 4px 24px rgb(255 255 255 / 14%);">
                         <div style="color: #fff; font-size: 14px; font-weight: 500; padding: 12px 0 0 0; text-align: center; border-top-left-radius: 32px; border-top-right-radius: 32px;">Following</div>
                         <div style="background: #ededed; border-radius: 24px; margin-top: 8px; width: 90%; display: flex; flex-direction: column; align-items: center; padding: 12px 0 0 0;">
                             <div id="following-count" style="font-size: 14px; font-weight: 600; color: #111; margin-bottom: 8px;">0</div>
@@ -139,7 +139,7 @@ class InstagramFollowersSelector {
         const followersActions = this.counterWidget.querySelector('#followers-actions');
         followersActions.innerHTML = '';
         if (!this.isObserving || this.mode !== 'followers') {
-            followersActions.innerHTML = `<button id="analyze-followers-btn" style="background: linear-gradient(180deg, #D53D85 0%, #4E2FD1 100%); color: #fff; font-size: 14px; font-weight: 500; border: none; border-radius: 18px; padding: 6px 16px; min-width: 80px; margin-bottom: 8px; cursor: pointer;">Analizza</button>`;
+            followersActions.innerHTML = `<button id="analyze-followers-btn" style="background: #833AB4; background: linear-gradient(146deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 70%, rgba(252, 176, 69, 1) 100%); color: #fff; font-size: 14px; font-weight: 500; border: none; border-radius: 18px; padding: 6px 16px; min-width: 80px; margin-bottom: 8px; cursor: pointer;">Analizza</button>`;
         } else {
             const icon = this.paused
                 ? `<svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#d44a6a"/><polygon points="12,10 24,16 12,22" fill="#fff"/></svg>`
@@ -157,7 +157,7 @@ class InstagramFollowersSelector {
         const followingActions = this.counterWidget.querySelector('#following-actions');
         followingActions.innerHTML = '';
         if (!this.isObserving || this.mode !== 'following') {
-            followingActions.innerHTML = `<button id="analyze-following-btn" style="background: linear-gradient(180deg, #D53D85 0%, #4E2FD1 100%); color: #fff; font-size: 14px; font-weight: 500; border: none; border-radius: 18px; padding: 6px 16px; min-width: 80px; margin-bottom: 8px; cursor: pointer;">Analizza</button>`;
+            followingActions.innerHTML = `<button id="analyze-followers-btn" style="background: #833AB4; background: linear-gradient(146deg, rgba(131, 58, 180, 1) 0%, rgba(253, 29, 29, 1) 70%, rgba(252, 176, 69, 1) 100%); color: #fff; font-size: 14px; font-weight: 500; border: none; border-radius: 18px; padding: 6px 16px; min-width: 80px; margin-bottom: 8px; cursor: pointer;">Analizza</button>`;
         } else {
             const icon = this.paused
                 ? `<svg width="28" height="28" viewBox="0 0 32 32"><circle cx="16" cy="16" r="14" fill="#4f7ae9"/><polygon points="12,10 24,16 12,22" fill="#fff"/></svg>`
